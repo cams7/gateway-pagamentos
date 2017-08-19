@@ -1,0 +1,27 @@
+#git rm --cached .classpath
+#git rm -r --cached .settings
+
+#Linux files
+*~
+hs_err_pid*.log
+replay_pid*.log
+
+#Windows file
+Thumbs.db
+
+#Maven directories
+target/
+
+#Eclipse files and directories
+.classpath
+.project
+.settings/
+bin/
+.metadata/
+
+*.class
+
+#Package files
+*.jar
+*.war
+*.ear
