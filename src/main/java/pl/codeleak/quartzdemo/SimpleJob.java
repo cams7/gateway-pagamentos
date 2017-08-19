@@ -1,12 +1,20 @@
 package pl.codeleak.quartzdemo;
 
-import org.quartz.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import pl.codeleak.quartzdemo.ejb.SimpleEjb;
+import java.text.SimpleDateFormat;
 
 import javax.ejb.EJB;
-import java.text.SimpleDateFormat;
+
+import org.jboss.as.quickstarts.ejbinwar.ejb.GreeterEJB;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.ExecuteInJTATransaction;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import pl.codeleak.quartzdemo.ejb.SimpleEjb;
 
 @DisallowConcurrentExecution
 @ExecuteInJTATransaction
@@ -17,6 +25,9 @@ public class SimpleJob implements Job {
 
     @EJB
     private SimpleEjb simpleEjb;
+    
+    @EJB
+    private GreeterEJB greeterEJB;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -29,5 +40,6 @@ public class SimpleJob implements Job {
             // intentionally left blank
         }
         simpleEjb.doSomething();
+        LOG.info(greeterEJB.sayHello(context.getTrigger().getKey().toString()));
     }
 }
