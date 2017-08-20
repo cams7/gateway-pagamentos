@@ -1,3 +1,4 @@
+package br.com.cams7.app.controller;
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual
@@ -14,46 +15,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.as.quickstart.hibernate4.data;
 
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.Reception;
 import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.as.quickstart.hibernate4.model.Member;
+import br.com.cams7.app.model.CustomerRepository;
+import br.com.cams7.app.model.entity.Customer;
 
 /**
  * @author Madhumita Sadhukhan
  */
 
 @RequestScoped
-public class MemberListProducer {
-	@Inject
-	private MemberRepository memberRepository;
+public class CustomerListProducer {
+	@EJB
+	private CustomerRepository customerRepository;
 
-	private List<Member> members;
+	private List<Customer> customers;
 
 	// @Named provides access the return value via the EL variable name "members" in
 	// the UI (e.g.,
 	// Facelets or JSP view)
 	@Produces
 	@Named
-	public List<Member> getMembers() {
-		return members;
+	public List<Customer> getCustomers() {
+		return customers;
 	}
 
-	public void onMemberListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Member member) {
-		retrieveAllMembersOrderedByName();
+	public void onMemberListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Customer customer) {
+		retrieveAllCustomersOrderedByName();
 	}
 
 	@PostConstruct
-	public void retrieveAllMembersOrderedByName() {
-		members = memberRepository.findAllOrderedByName();
+	public void retrieveAllCustomersOrderedByName() {
+		customers = customerRepository.findAllOrderedByName();
 	}
 }

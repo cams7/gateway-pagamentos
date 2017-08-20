@@ -41,7 +41,7 @@
 		<app.persistence.jta.data.source>java:jboss/datasources/SQLiteDS</app.persistence.jta.data.source>
 		<app.persistence.hibernate.dialect>com.enigmabridge.hibernate.dialect.SQLiteDialect</app.persistence.hibernate.dialect>
 		<app.persistence.hibernate.hbm2ddl.auto>create-drop</app.persistence.hibernate.hbm2ddl.auto>
-		<app.persistence.hibernate.show_sql>true</app.persistence.hibernate.show_sql>
+		<app.persistence.hibernate.show_sql>true</app.persistence.hibernate.show_sql>		
 	</properties>
 
 	<dependencyManagement>
@@ -207,7 +207,7 @@
 				<app.datasource.h2.connection.url>jdbc:h2:file:/home/vagrant/github/quartz-jee-demo/db/quartz_jee_demo.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url>
 				<app.datasource.sqlite.connection.url>jdbc:sqlite:/home/vagrant/github/quartz-jee-demo/db/quartz_jee_demo.sqlite</app.datasource.sqlite.connection.url>
 
-				<!--app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source>
+				<!-- app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source>
 				<app.persistence.hibernate.dialect>org.hibernate.dialect.H2Dialect</app.persistence.hibernate.dialect-->
 			</properties>
 		</profile>

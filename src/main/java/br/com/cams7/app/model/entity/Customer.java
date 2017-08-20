@@ -14,56 +14,67 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.as.quickstart.hibernate4.model;
+package br.com.cams7.app.model.entity;
 
 import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
-/*The Model uses JPA Entity as well as Hibernate Validators
- * 
- */
-
+@SuppressWarnings("serial")
 @Entity
-@XmlRootElement
-@Table(name = "MemberHibernate4Demo", uniqueConstraints = @UniqueConstraint(columnNames = "id"))
-public class Member implements Serializable {
-	/** Default value included to remove warning. Remove or modify at will. **/
-	private static final long serialVersionUID = 1L;
+@Table(name = "cliente")
+public class Customer implements Serializable {
 
 	@Id
+	@SequenceGenerator(name = "customerSequence", sequenceName = "cliente_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customerSequence")
+	@Column(name = "cliente_id")
 	private Long id;
 
 	@NotNull
 	@Size(min = 1, max = 25)
 	@Pattern(regexp = "[A-Za-z ]*", message = "must contain only letters and spaces")
+	@Column(name = "cliente_nome")
 	private String name;
 
 	/** using hibernate4 validators **/
 	@NotNull
 	@NotEmpty
 	@Email
+	@Column(name = "cliente_email")
 	private String email;
 
 	@NotNull
 	@Size(min = 9, max = 12)
 	@Digits(fraction = 0, integer = 12)
-	@Column(name = "phone_number")
+	@Column(name = "cliente_telefone")
 	private String phoneNumber;
 
+	@Size(min = 5, max = 255)
+	@Column(name = "cliente_endereco")
 	private String address;
+
+	public Customer() {
+		super();
+	}
+
+	public Customer(Long id) {
+		this();
+		this.id = id;
+	}
 
 	public Long getId() {
 		return id;

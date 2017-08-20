@@ -1,9 +1,9 @@
-package pl.codeleak.quartzdemo.ejb;
+package br.com.cams7.app.service;
 
 import javax.ejb.Stateless;
 
 @Stateless
-public class SimpleEjb {
+public class SimpleService {
 	public void doSomething() {
 	}
 }

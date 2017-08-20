@@ -1,11 +1,10 @@
-package pl.codeleak.quartzdemo;
+package br.com.cams7.app.quartz;
 
 import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 
-import org.jboss.as.quickstarts.ejbinwar.ejb.GreeterEJB;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.ExecuteInJTATransaction;
 import org.quartz.Job;
@@ -13,7 +12,8 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
 
-import pl.codeleak.quartzdemo.ejb.SimpleEjb;
+import br.com.cams7.app.service.GreeterService;
+import br.com.cams7.app.service.SimpleService;
 
 @DisallowConcurrentExecution
 @ExecuteInJTATransaction
@@ -23,10 +23,10 @@ public class SimpleJob implements Job {
 	private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
 	@EJB
-	private SimpleEjb simpleEjb;
+	private SimpleService simpleService;
 
 	@EJB
-	private GreeterEJB greeterEJB;
+	private GreeterService greeterService;
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -36,7 +36,7 @@ public class SimpleJob implements Job {
 		} catch (SchedulerException e) {
 			// intentionally left blank
 		}
-		simpleEjb.doSomething();
-		LOG.info(greeterEJB.sayHello(context.getTrigger().getKey().toString()));
+		simpleService.doSomething();
+		LOG.info(greeterService.sayHello(context.getTrigger().getKey().toString()));
 	}
 }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.as.quickstarts.ejbinwar.ejb;
+package br.com.cams7.app.service;
 
 import javax.ejb.Stateful;
 
@@ -24,7 +24,7 @@ import javax.ejb.Stateful;
  * @author paul.robinson@redhat.com, 2011-12-21
  */
 @Stateful
-public class GreeterEJBImpl implements GreeterEJB {
+public class GreeterServiceImpl implements GreeterService {
 	/**
 	 * This method takes a name and returns a personalised greeting.
 	 * 

@@ -14,37 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.as.quickstart.hibernate4.service;
+package br.com.cams7.app.util;
 
-import org.jboss.as.quickstart.hibernate4.model.Member;
-
-import javax.ejb.Stateless;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import java.util.logging.Logger;
-import org.hibernate.Session;
 
-// The @Stateless annotation eliminates the need for manual transaction demarcation
-@Stateless
-public class MemberRegistration {
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.InjectionPoint;
+import javax.faces.context.FacesContext;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
-	@Inject
-	private Logger log;
+public class Resources {
 
-	@Inject
+	@Produces
+	@PersistenceContext
 	private EntityManager em;
 
-	@Inject
-	private Event<Member> memberEventSrc;
-
-	public void register(Member member) throws Exception {
-		log.info("Registering " + member.getName());
-		// em.persist(member);
-
-		// using Hibernate session(Native API) and JPA entitymanager
-		Session session = (Session) em.getDelegate();
-		session.persist(member);
-		memberEventSrc.fire(member);
+	@Produces
+	public Logger produceLog(InjectionPoint injectionPoint) {
+		return Logger.getLogger(injectionPoint.getMember().getDeclaringClass().getName());
 	}
+
+	@Produces
+	@RequestScoped
+	public FacesContext produceFacesContext() {
+		return FacesContext.getCurrentInstance();
+	}
+
 }

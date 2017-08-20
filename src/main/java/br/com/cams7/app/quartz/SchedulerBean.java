@@ -1,4 +1,4 @@
-package pl.codeleak.quartzdemo;
+package br.com.cams7.app.quartz;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;

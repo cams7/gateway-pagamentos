@@ -14,66 +14,62 @@
 		</div>
 
 		<h:form id="reg">
-			<h2>Member Registration</h2>
+			<h2>Customer Registration</h2>
 			<p>Demonstrates quickstart application for Hibernate using Jboss
 				WildFly.</p>
 			<h:panelGrid columns="3" columnClasses="titleCell">
-				<h:outputLabel for="id" value="Member Id (Enter unique number):" />
-				<h:inputText id="id" value="#{newMember.id}" />
-				<h:message for="id" errorClass="invalid" />
-
 				<h:outputLabel for="name" value="Name:" />
-				<h:inputText id="name" value="#{newMember.name}" />
+				<h:inputText id="name" value="#{newCustomer.name}" />
 				<h:message for="name" errorClass="invalid" />
 
 				<h:outputLabel for="email" value="Email:" />
-				<h:inputText id="email" value="#{newMember.email}" />
+				<h:inputText id="email" value="#{newCustomer.email}" />
 				<h:message for="email" errorClass="invalid" />
 
 				<h:outputLabel for="phoneNumber" value="Phone #:" />
-				<h:inputText id="phoneNumber" value="#{newMember.phoneNumber}" />
+				<h:inputText id="phoneNumber" value="#{newCustomer.phoneNumber}" />
 				<h:message for="phoneNumber" errorClass="invalid" />
 
 				<h:outputLabel for="address" value="Address:" />
-				<h:inputText id="address" value="#{newMember.address}" />
+				<h:inputText id="address" value="#{newCustomer.address}" />
 				<h:message for="address" errorClass="invalid" />
 			</h:panelGrid>
 
 			<p>
 				<h:panelGrid columns="2">
 					<h:commandButton id="register"
-						action="#{memberController.register}" value="Register"
+						action="#{customerController.register}" value="Register"
 						styleClass="register" />
 					<h:messages styleClass="messages" errorClass="invalid"
 						infoClass="valid" warnClass="warning" globalOnly="true" />
 				</h:panelGrid>
 			</p>
 		</h:form>
-		<h2>Members</h2>
-		<h:panelGroup rendered="#{empty members}">
-			<em>No registered members.</em>
+		<h2>Customers</h2>
+		<h:panelGroup rendered="#{empty customers}">
+			<em>No registered customers.</em>
 		</h:panelGroup>
-		<h:dataTable var="_member" value="#{members}"
-			rendered="#{not empty members}" styleClass="simpletablestyle">
+		<h:dataTable var="c" value="#{customers}"
+			rendered="#{not empty customers}" styleClass="simpletablestyle">
 			<h:column>
 				<f:facet name="header">Id</f:facet>
-                #{_member.id}
+                #{c.id}
             </h:column>
 			<h:column>
 				<f:facet name="header">Name</f:facet>
-                #{_member.name}
+                #{c.name}
             </h:column>
 			<h:column>
 				<f:facet name="header">Email</f:facet>
-                #{_member.email}
+                #{c.email}
             </h:column>
 			<h:column>
 				<f:facet name="header">Phone #</f:facet>
-                #{_member.phoneNumber}
+                #{c.phoneNumber}
             </h:column>
 			<h:column>
 				<f:facet name="header">Address #</f:facet>
-                #{_member.address}
+                #{c.address}
             </h:column>
 		</h:dataTable>
 	</ui:define>
