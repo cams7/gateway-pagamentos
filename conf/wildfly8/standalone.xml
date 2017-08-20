@@ -146,29 +146,15 @@
                         <password>sa</password>
                     </security>
                 </datasource>
-                <datasource jta="true" jndi-name="java:jboss/datasources/JtaMySqlDS" pool-name="JtaMySqlDS" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:mysql://localhost:3306/quartz_jee_demo</connection-url>
-                    <driver>mysql</driver>
-                    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
-                    <security>
-                        <user-name>quartz</user-name>
-                        <password>demo</password>
-                    </security>
-                </datasource>
-                <datasource jta="false" jndi-name="java:jboss/datasources/MySqlDS" pool-name="MySqlDS" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:mysql://localhost:3306/quartz_jee_demo</connection-url>
-                    <driver>mysql</driver>
-                    <security>
-                        <user-name>quartz</user-name>
-                        <password>demo</password>
-                    </security>
-                </datasource>
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
                     </driver>
                     <driver name="mysql" module="com.mysql">
                         <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="sqlite" module="com.sqlite">
+                        <driver-class>org.sqlite.JDBC</driver-class>
                     </driver>
                 </drivers>
             </datasources>

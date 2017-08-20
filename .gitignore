@@ -25,3 +25,5 @@ bin/
 *.jar
 *.war
 *.ear
+
+db/

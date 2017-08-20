@@ -1,0 +1,123 @@
+cd C:\Desenv\Vagrant\boxes\emp1
+
+vagrant init scloudy/ubuntu-xenial64
+vagrant up --provider virtualbox
+vagrant status
+vagrant halt
+
+Username: vagrant
+Password: vagrant
+
+---------------------------------------------------------------------------------------------------
+
+vagrant ssh
+
+sudo rm /var/lib/dpkg/lock
+sudo dpkg --configure -a
+sudo apt update
+sudo apt-get -f install
+sudo apt upgrade
+
+---------------------------------------------------------------------------------------------------
+
+sudo apt-get update
+sudo apt-get install git-core
+git config --global user.name "César A. Magalhães"
+git config --global user.email "ceanma@gmail.com"
+ssh-keygen -t rsa -C "ceanma@gmail.com"
+
+vim ~/.ssh/id_rsa.pub
+
+ssh -T git@github.com
+
+---------------------------------------------------------------------------------------------------
+
+sudo add-apt-repository ppa:openjdk-r/ppa  
+sudo apt-get update   
+sudo apt-get install openjdk-7-jdk
+
+---------------------------------------------------------------------------------------------------
+
+echo 'export MVN_HOME=/opt/apache-maven-3.3.9' >> ~/.bashrc
+echo 'export PATH=$PATH:$MVN_HOME/bin' >> ~/.bashrc
+
+echo 'export JBOSS_HOME=/opt/wildfly-8.2.1.Final' >> ~/.bashrc 
+
+echo 'export CATALINA_HOME=/opt/apache-tomcat-8.5.20' >> ~/.bashrc
+
+---------------------------------------------------------------------------------------------------
+
+#http://blog.codeleak.pl/2014/05/how-to-quartz-scheduler-with-clustering.html
+
+cd /home/vagrant/github
+git clone https://github.com/cams7/quartz-jee-demo.git 
+
+cd /home/vagrant/github/quartz-jee-demo
+mvn clean install
+
+---------------------------------------------------------------------------------------------------
+
+cd /home/vagrant/github
+git clone https://github.com/wildfly/quickstart.git -b8.x
+
+cd /home/vagrant/github/quickstart
+mvn install -DskipTests
+find . -name '*.java' -exec grep "org.slf4j.Logger" /dev/null {} \;
+
+---------------------------------------------------------------------------------------------------
+
+sudo apt-get install mysql-server
+mysql --version
+
+sudo vim /etc/mysql/mysql.conf.d/mysqld.cnf
+	#bind-address           = 127.0.0.1
+	
+sudo /etc/init.d/mysql restart
+
+mysql -uroot -proot
+CREATE DATABASE quartz_jee_demo;
+CREATE USER 'quartz'@'%' IDENTIFIED BY 'demo';
+GRANT ALL PRIVILEGES ON quartz_jee_demo.* TO 'quartz'@'%';
+FLUSH PRIVILEGES;		
+exit		
+mysql --host=127.0.0.1 --user=quartz --password=demo quartz_jee_demo
+source /home/vagrant/github/quartz-jee-demo/src/main/conf/quartz-mysql-tables/tables_mysql_innodb.sql;
+exit
+
+---------------------------------------------------------------------------------------------------
+
+$JBOSS_HOME/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -b 0.0.0.0 -bmanagement 0.0.0.0
+
+$JBOSS_HOME/bin/add-user.sh
+
+Username: admin
+Password: admin@123
+
+---------------------------------------------------------------------------------------------------
+
+#https://stackoverflow.com/questions/36703856/access-tomcat-manager-app-from-different-host
+
+tomcat-users.xml
+	<role rolename="manager-gui"/>
+	<role rolename="admin-gui"/>
+	<user username="admin" password="admin" roles="manager-gui,admin-gui"/>
+
+$CATALINA_HOME/bin/startup.sh
+$CATALINA_HOME/bin/shutdown.sh
+
+Username: admin
+Password: admin
+
+---------------------------------------------------------------------------------------------------
+
+Eclipse 
+
+https://stackoverflow.com/questions/3736208/how-to-exclude-a-folder-that-is-producing-warnings-errors-in-an-eclipse-project
+
+---------------------------------------------------------------------------------------------------
+
+https://developer.jboss.org/thread/250782?_sscc=t
+http://sjoker.net/2013/12/squirrel-sql-client-sqlite-databases/
+https://www.digitalocean.com/community/tutorials/how-and-when-to-use-sqlite
+
+

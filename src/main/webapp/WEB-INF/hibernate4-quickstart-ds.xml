@@ -2,16 +2,39 @@
 <datasources xmlns="http://www.jboss.org/ironjacamar/schema"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.jboss.org/ironjacamar/schema http://docs.jboss.org/ironjacamar/schema/datasources_1_0.xsd">
-	<!-- The datasource is bound into JNDI at this location. We reference this 
-		in META-INF/persistence.xml -->
-	<datasource jndi-name="java:jboss/datasources/Hibernate4QuickstartDS"
-		pool-name="hibernate4-quickstart" enabled="true" use-java-context="true">
-		<connection-url>jdbc:h2:mem:hibernate4-quickstart;DB_CLOSE_ON_EXIT=FALSE;DB_CLOSE_DELAY=-1</connection-url>
+	<datasource jta="true" jndi-name="${app.quartz.dataSource.jndiURL}"
+		pool-name="${app.quartz.dataSource}" enabled="true" use-java-context="true">
+		<connection-url>${app.quartz.datasource.connection.url}</connection-url>
+		<driver>${app.quartz.datasource.driver}</driver>
+		<transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
+		<security>
+			<user-name>${app.quartz.datasource.username}</user-name>
+			<password>${app.quartz.datasource.password}</password>
+		</security>
+	</datasource>
+	<datasource jta="false"
+		jndi-name="${app.quartz.nonManagedTXDataSource.jndiURL}" pool-name="${app.quartz.nonManagedTXDataSource}"
+		enabled="true" use-java-context="true">
+		<connection-url>${app.quartz.datasource.connection.url}</connection-url>
+		<driver>${app.quartz.datasource.driver}</driver>
+		<security>
+			<user-name>${app.quartz.datasource.username}</user-name>
+			<password>${app.quartz.datasource.password}</password>
+		</security>
+	</datasource>
+	<datasource jndi-name="java:jboss/datasources/H2DS"
+		pool-name="H2DS" enabled="true" use-java-context="true">
+		<connection-url>${app.datasource.h2.connection.url}</connection-url>
 		<driver>h2</driver>
 		<security>
-			<user-name>sa</user-name>
-			<password>sa</password>
+			<user-name>${app.datasource.h2.username}</user-name>
+			<password>${app.datasource.h2.password}</password>
 		</security>
+	</datasource>
+	<datasource jndi-name="java:jboss/datasources/SQLiteDS"
+		pool-name="SQLiteDS" enabled="true" use-java-context="true">
+		<connection-url>${app.datasource.sqlite.connection.url}</connection-url>
+		<driver>sqlite</driver>
 	</datasource>
 </datasources>
  
