@@ -10,9 +10,9 @@
 	<name>Gateway de pagamentos</name>
 	<description>Gateway de pagamentos</description>
 
-	<url>https://github.com/cams7/quartz-jee-demo/tree/master</url>
+	<url>https://github.com/cams7/gateway-pagamentos/tree/master</url>
 	<scm>
-		<connection>scm:git:https://github.com/cams7/quartz-jee-demo.git</connection>
+		<connection>scm:git:https://github.com/cams7/gateway-pagamentos.git</connection>
 	</scm>
 
 	<properties>

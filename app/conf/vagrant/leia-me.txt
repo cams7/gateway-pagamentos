@@ -50,9 +50,9 @@ echo 'export CATALINA_HOME=/opt/apache-tomcat-8.5.20' >> ~/.bashrc
 #http://blog.codeleak.pl/2014/05/how-to-quartz-scheduler-with-clustering.html
 
 cd /home/vagrant/github
-git clone https://github.com/cams7/quartz-jee-demo.git 
+git clone https://github.com/cams7/gateway-pagamentos.git 
 
-cd /home/vagrant/github/quartz-jee-demo
+cd /home/vagrant/github/gateway-pagamentos
 mvn clean install
 
 ---------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ GRANT ALL PRIVILEGES ON quartz_jee_demo.* TO 'quartz'@'%';
 FLUSH PRIVILEGES;		
 exit		
 mysql --host=127.0.0.1 --user=quartz --password=demo quartz_jee_demo
-source /home/vagrant/github/quartz-jee-demo/src/main/conf/quartz-mysql-tables/tables_mysql_innodb.sql;
+source /home/vagrant/github/gateway-pagamentos/app/src/main/conf/quartz-mysql-tables/tables_mysql_innodb.sql;
 exit
 
 ---------------------------------------------------------------------------------------------------
