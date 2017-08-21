@@ -12,18 +12,24 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
 
-import br.com.cams7.app.model.CustomerRepository;
-import br.com.cams7.app.model.entity.Customer;
+import br.com.cams7.app.model.OrderRepository;
+import br.com.cams7.app.model.entity.Order;
+import br.com.cams7.app.model.entity.Order.PaymentMethod;
 
+/**
+ * @author cesaram
+ *
+ *         Processa os pagamento no boleto bancário
+ */
 @DisallowConcurrentExecution
 @ExecuteInJTATransaction
-public class SimpleJob implements Job {
+public class BankSlipJob implements Job {
 
-	private static final Logger LOG = Logger.getLogger("MyJob");
+	private static final Logger LOG = Logger.getLogger(BankSlipJob.class.getSimpleName());
 	private final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
 
 	@EJB
-	private CustomerRepository customerRepository;
+	private OrderRepository orderRepository;
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -31,9 +37,12 @@ public class SimpleJob implements Job {
 			LOG.info(String.format("Trigger: %s, Fired at: %s, Instance: %s", context.getTrigger().getKey(),
 					SDF.format(context.getFireTime()), context.getScheduler().getSchedulerInstanceId()));
 		} catch (SchedulerException e) {
-			// intentionally left blank
 		}
-		Customer customer = customerRepository.findById(1L);
-		LOG.info(String.format("O cliente %s foi consultado", customer.getEmail()));
+
+		Order order = orderRepository.findByPaymentMethod(PaymentMethod.BANK_SLIP);
+		if (order != null)
+			LOG.info(String.format("O pedido (%s) com pagamento no boleto bancário foi processado...",
+					SDF.format(order.getOrderDate())));
+
 	}
 }

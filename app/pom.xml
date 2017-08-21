@@ -35,6 +35,8 @@
 
 		<app.datasource.sqlite.connection.url>jdbc:sqlite:/Dev/Vagrant/teste/github/gateway-pagamentos/app/db/quartz_jee_demo.sqlite</app.datasource.sqlite.connection.url>
 
+		<!-- app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source>
+		<app.persistence.hibernate.dialect>org.hibernate.dialect.H2Dialect</app.persistence.hibernate.dialect-->
 		<app.persistence.jta.data.source>java:jboss/datasources/SQLiteDS</app.persistence.jta.data.source>
 		<app.persistence.hibernate.dialect>com.enigmabridge.hibernate.dialect.SQLiteDialect</app.persistence.hibernate.dialect>
 		<app.persistence.hibernate.hbm2ddl.auto>create-drop</app.persistence.hibernate.hbm2ddl.auto>

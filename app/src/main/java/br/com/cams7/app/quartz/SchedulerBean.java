@@ -1,19 +1,28 @@
 package br.com.cams7.app.quartz;
 
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.impl.matchers.GroupMatcher;
-import org.quartz.spi.JobFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.Set;
+
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
+import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.spi.JobFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Startup
 @Singleton
@@ -33,24 +42,40 @@ public class SchedulerBean {
 			scheduler = new StdSchedulerFactory().getScheduler();
 			scheduler.setJobFactory(jobFactory);
 
-			JobKey job1Key = JobKey.jobKey("job1", "my-jobs");
-			JobDetail job1 = JobBuilder.newJob(SimpleJob.class).withIdentity(job1Key).build();
+			final String DOWN_PAYMENT_JOB = "conta-corrente-job";
+			final String CREDID_CARD_JOB = "cartao-credito-job";
+			final String BANK_SLIP_JOB = "boleto-bancario-job";
 
-			TriggerKey tk1 = TriggerKey.triggerKey("trigger1", "my-jobs");
-			Trigger trigger1 = TriggerBuilder.newTrigger().withIdentity(tk1).startNow()
-					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(5)).build();
+			// Processa pagamento à vista
+			JobDetail downPaymentJob = JobBuilder.newJob(DownPaymentJob.class)
+					.withIdentity(JobKey.jobKey("job1", DOWN_PAYMENT_JOB)).build();
 
-			TriggerKey tk2 = TriggerKey.triggerKey("trigger2", "my-jobs");
-			Trigger trigger2 = TriggerBuilder.newTrigger().withIdentity(tk2).startNow()
-					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(5)).build();
+			Trigger downPaymentTrigger = TriggerBuilder.newTrigger()
+					.withIdentity(TriggerKey.triggerKey("conta-corrente-trigger", DOWN_PAYMENT_JOB)).startNow()
+					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(10)).build();
 
-			TriggerKey tk3 = TriggerKey.triggerKey("trigger3", "my-jobs");
-			Trigger trigger3 = TriggerBuilder.newTrigger().withIdentity(tk3).startNow()
-					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(5)).build();
+			// Processa pagamento no cartão de credito
+			JobDetail credidCardJob = JobBuilder.newJob(CredidCardJob.class)
+					.withIdentity(JobKey.jobKey("job2", CREDID_CARD_JOB)).build();
+
+			Trigger credidCardTrigger = TriggerBuilder.newTrigger()
+					.withIdentity(TriggerKey.triggerKey("cartao-credito-trigger", CREDID_CARD_JOB)).startNow()
+					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(30)).build();
+
+			// Processa pagamento no boleto bancário
+			JobDetail bankSlipJob = JobBuilder.newJob(BankSlipJob.class)
+					.withIdentity(JobKey.jobKey("job3", BANK_SLIP_JOB)).build();
+
+			Trigger bankSlipTrigger = TriggerBuilder.newTrigger()
+					.withIdentity(TriggerKey.triggerKey("boleto-bancario-trigger", BANK_SLIP_JOB)).startNow()
+					.withSchedule(SimpleScheduleBuilder.repeatMinutelyForever()).build();
 
 			scheduler.start(); // starting a scheduler before scheduling jobs helped in getting rid of deadlock
 								// on startup
-			scheduler.scheduleJob(job1, newHashSet(trigger1, trigger2, trigger3), true);
+			scheduler.scheduleJob(downPaymentJob, newHashSet(downPaymentTrigger), true);
+			scheduler.scheduleJob(credidCardJob, newHashSet(credidCardTrigger), true);
+			scheduler.scheduleJob(bankSlipJob, newHashSet(bankSlipTrigger), true);
+
 			printJobsAndTriggers(scheduler);
 		} catch (SchedulerException e) {
 			LOG.error("Error while creating scheduler", e);
