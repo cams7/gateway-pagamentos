@@ -17,6 +17,7 @@ package br.com.cams7.app.controller;
  */
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -24,33 +25,41 @@ import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.Reception;
 import javax.enterprise.inject.Produces;
+import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 
-import br.com.cams7.app.model.CustomerRepository;
-import br.com.cams7.app.model.entity.Customer;
+import br.com.cams7.app.model.OrderRepository;
+import br.com.cams7.app.model.entity.Order;
 
 /**
  * @author Madhumita Sadhukhan
  */
 @RequestScoped
-public class CustomerListProducer {
+public class OrderListProducer {
 	@EJB
-	private CustomerRepository customerRepository;
+	private OrderRepository orderRepository;
 
-	private List<Customer> customers;
+	@Inject
+	private FacesContext facesContext;
+
+	private List<Order> orders;
 
 	@Produces
 	@Named
-	public List<Customer> getCustomers() {
-		return customers;
+	public List<Order> getOrders() {
+		return orders;
 	}
 
-	public void onCustomerListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Customer customer) {
-		retrieveAllCustomers();
+	public void onOrderListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Order order) {
+		retrieveAllOrders();
 	}
 
 	@PostConstruct
-	public void retrieveAllCustomers() {
-		customers = customerRepository.findAll();
+	public void retrieveAllOrders() {
+		Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
+		String param = params.get("c");
+		Long customerId = Long.valueOf(param);
+		orders = orderRepository.findAllByCustomer(customerId);
 	}
 }

@@ -8,8 +8,8 @@ public interface CustomerRepository {
 
 	Customer findById(Long id);
 
-	List<Customer> findAllOrderedByName();
+	List<Customer> findAll();
 
-	void register(Customer member);
+	void register(Customer customer);
 
 }

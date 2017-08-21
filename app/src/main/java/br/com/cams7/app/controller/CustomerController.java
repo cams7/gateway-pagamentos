@@ -33,12 +33,12 @@ public class CustomerController {
 		try {
 			customerRepository.register(newCustomer);
 			facesContext.addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Registered!", "Registration successful"));
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Cadastrado!", "Cadastrado com sucesso"));
 			initNewCustomer();
 		} catch (Exception e) {
 			String errorMessage = getRootErrorMessage(e);
 			facesContext.addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, errorMessage, "Registration unsuccessful"));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, errorMessage, "Ocorreu um erro"));
 		}
 	}
 

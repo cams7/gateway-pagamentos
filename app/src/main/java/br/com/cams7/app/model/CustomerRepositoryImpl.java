@@ -48,7 +48,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	}
 
 	@Override
-	public List<Customer> findAllOrderedByName() {
+	public List<Customer> findAll() {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Customer> cq = cb.createQuery(Customer.class);
 
@@ -63,7 +63,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	@Override
 	public void register(Customer customer) {
-		log.info("Registering " + customer.getName());
+		log.info(String.format("Registering %s", customer.getName()));
 
 		em.persist(customer);
 
