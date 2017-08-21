@@ -1,0 +1,173 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>br.com.cams7</groupId>
+		<artifactId>gateway-pagamentos</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>gateway-pagamentos-app</artifactId>
+	<packaging>war</packaging>
+
+	<name>Aplicação de Gateway de pagamentos</name>
+
+	<properties>		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<version.jboss.bom>8.0.0.Final</version.jboss.bom>
+
+		<org.slf4j-version>1.7.7</org.slf4j-version>
+
+		<app.quartz.datasource.connection.url>jdbc:mysql://localhost:3306/quartz_jee_demo</app.quartz.datasource.connection.url>
+		<app.quartz.datasource.driver>mysql</app.quartz.datasource.driver>
+		<app.quartz.datasource.username>quartz</app.quartz.datasource.username>
+		<app.quartz.datasource.password>demo</app.quartz.datasource.password>
+		<app.quartz.dataSource>JtaMySqlDS</app.quartz.dataSource>
+		<app.quartz.nonManagedTXDataSource>MySqlDS</app.quartz.nonManagedTXDataSource>
+		<app.quartz.dataSource.jndiURL>java:jboss/datasources/${app.quartz.dataSource}</app.quartz.dataSource.jndiURL>
+		<app.quartz.nonManagedTXDataSource.jndiURL>java:jboss/datasources/${app.quartz.nonManagedTXDataSource}</app.quartz.nonManagedTXDataSource.jndiURL>
+
+		<app.datasource.h2.connection.url>jdbc:h2:file:/Dev/Vagrant/teste/github/gateway-pagamentos/app/db/quartz_jee_demo.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url>
+		<app.datasource.h2.username>sa</app.datasource.h2.username>
+		<app.datasource.h2.password>sa</app.datasource.h2.password>
+
+		<app.datasource.sqlite.connection.url>jdbc:sqlite:/Dev/Vagrant/teste/github/gateway-pagamentos/app/db/quartz_jee_demo.sqlite</app.datasource.sqlite.connection.url>
+
+		<app.persistence.jta.data.source>java:jboss/datasources/SQLiteDS</app.persistence.jta.data.source>
+		<app.persistence.hibernate.dialect>com.enigmabridge.hibernate.dialect.SQLiteDialect</app.persistence.hibernate.dialect>
+		<app.persistence.hibernate.hbm2ddl.auto>create-drop</app.persistence.hibernate.hbm2ddl.auto>
+		<app.persistence.hibernate.show_sql>true</app.persistence.hibernate.show_sql>		
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-hibernate</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jboss.spec.javax.annotation</groupId>
+			<artifactId>jboss-annotations-api_1.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- dependency> <groupId>org.jboss.resteasy</groupId> <artifactId>jaxrs-api</artifactId> 
+			<scope>provided</scope> </dependency -->
+
+		<dependency>
+			<groupId>org.jboss.spec.javax.ejb</groupId>
+			<artifactId>jboss-ejb-api_3.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.1-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.enigmabridge</groupId>
+			<artifactId>hibernate4-sqlite-dialect</artifactId>
+			<version>0.1.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.spec.javax.faces</groupId>
+			<artifactId>jboss-jsf-api_2.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Logging -->
+		<!-- dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
+			<version>${org.slf4j-version}</version> </dependency -->
+		<!-- Quartz -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz-jobs</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>	
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<warName>gateway-pagamentos-app</warName>
+					<webResources>
+						<resource>
+							<directory>src/main/webapp</directory>
+							<filtering>true</filtering>
+							<includes>
+								<include>WEB-INF/*.xml</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>unix</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>Linux</name>
+				</os>
+			</activation>
+			<properties>
+				<app.datasource.h2.connection.url>jdbc:h2:file:/vagrant/github/gateway-pagamentos/app/db/quartz_jee_demo.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url>
+				<app.datasource.sqlite.connection.url>jdbc:sqlite:/vagrant/github/gateway-pagamentos/app/db/quartz_jee_demo.sqlite</app.datasource.sqlite.connection.url>
+
+				<!-- app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source>
+				<app.persistence.hibernate.dialect>org.hibernate.dialect.H2Dialect</app.persistence.hibernate.dialect-->
+			</properties>
+		</profile>
+	</profiles>
+</project>

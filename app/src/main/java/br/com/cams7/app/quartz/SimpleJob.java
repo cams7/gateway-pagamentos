@@ -12,31 +12,28 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
 
-import br.com.cams7.app.service.GreeterService;
-import br.com.cams7.app.service.SimpleService;
+import br.com.cams7.app.model.CustomerRepository;
+import br.com.cams7.app.model.entity.Customer;
 
 @DisallowConcurrentExecution
 @ExecuteInJTATransaction
 public class SimpleJob implements Job {
 
 	private static final Logger LOG = Logger.getLogger("MyJob");
-	private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	private final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
 
 	@EJB
-	private SimpleService simpleService;
-
-	@EJB
-	private GreeterService greeterService;
+	private CustomerRepository customerRepository;
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
 			LOG.info(String.format("Trigger: %s, Fired at: %s, Instance: %s", context.getTrigger().getKey(),
-					sdf.format(context.getFireTime()), context.getScheduler().getSchedulerInstanceId()));
+					SDF.format(context.getFireTime()), context.getScheduler().getSchedulerInstanceId()));
 		} catch (SchedulerException e) {
 			// intentionally left blank
 		}
-		simpleService.doSomething();
-		LOG.info(greeterService.sayHello(context.getTrigger().getKey().toString()));
+		Customer customer = customerRepository.findById(1L);
+		LOG.info(String.format("O cliente %s foi consultado", customer.getEmail()));
 	}
 }

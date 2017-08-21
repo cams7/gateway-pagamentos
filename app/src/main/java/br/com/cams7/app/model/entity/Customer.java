@@ -25,7 +25,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -56,16 +55,6 @@ public class Customer implements Serializable {
 	@Email
 	@Column(name = "cliente_email")
 	private String email;
-
-	@NotNull
-	@Size(min = 9, max = 12)
-	@Digits(fraction = 0, integer = 12)
-	@Column(name = "cliente_telefone")
-	private String phoneNumber;
-
-	@Size(min = 5, max = 255)
-	@Column(name = "cliente_endereco")
-	private String address;
 
 	public Customer() {
 		super();
@@ -100,19 +89,4 @@ public class Customer implements Serializable {
 		this.email = email;
 	}
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
-
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
 }

@@ -2,214 +2,173 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>pl.codeleak</groupId>
-	<artifactId>quartz-jee-demo</artifactId>
-	<version>1.0</version>
-	<packaging>war</packaging>
+	<groupId>br.com.cams7</groupId>
+	<artifactId>gateway-pagamentos</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-	<name>quartz-jee-demo</name>
+	<name>Gateway de pagamentos</name>
+	<description>Gateway de pagamentos</description>
+
+	<url>https://github.com/cams7/quartz-jee-demo/tree/master</url>
+	<scm>
+		<connection>scm:git:https://github.com/cams7/quartz-jee-demo.git</connection>
+	</scm>
 
 	<properties>
-		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+		<user.name>César A. Magalhães</user.name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
+		
+		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<maven.compiler.source>1.7</maven.compiler.source>
-
+		
 		<version.compiler.plugin>2.3.2</version.compiler.plugin>
+		<version.jar.plugin>2.6</version.jar.plugin>
 		<version.war.plugin>2.1.1</version.war.plugin>
-
-		<version.jboss.bom>8.0.0.Final</version.jboss.bom>
-
-		<org.slf4j-version>1.7.7</org.slf4j-version>
-
-		<app.quartz.datasource.connection.url>jdbc:mysql://localhost:3306/quartz_jee_demo</app.quartz.datasource.connection.url>
-		<app.quartz.datasource.driver>mysql</app.quartz.datasource.driver>
-		<app.quartz.datasource.username>quartz</app.quartz.datasource.username>
-		<app.quartz.datasource.password>demo</app.quartz.datasource.password>
-		<app.quartz.dataSource>JtaMySqlDS</app.quartz.dataSource>
-		<app.quartz.nonManagedTXDataSource>MySqlDS</app.quartz.nonManagedTXDataSource>
-		<app.quartz.dataSource.jndiURL>java:jboss/datasources/${app.quartz.dataSource}</app.quartz.dataSource.jndiURL>
-		<app.quartz.nonManagedTXDataSource.jndiURL>java:jboss/datasources/${app.quartz.nonManagedTXDataSource}</app.quartz.nonManagedTXDataSource.jndiURL>
-
-		<app.datasource.h2.connection.url>jdbc:h2:file:/Desenv/Github/emp1/quartz-jee-demo/db/quartz_jee_demo.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url>
-		<app.datasource.h2.username>sa</app.datasource.h2.username>
-		<app.datasource.h2.password>sa</app.datasource.h2.password>
-
-		<app.datasource.sqlite.connection.url>jdbc:sqlite:/Desenv/Github/emp1/quartz-jee-demo/db/quartz_jee_demo.sqlite</app.datasource.sqlite.connection.url>
-
-		<app.persistence.jta.data.source>java:jboss/datasources/SQLiteDS</app.persistence.jta.data.source>
-		<app.persistence.hibernate.dialect>com.enigmabridge.hibernate.dialect.SQLiteDialect</app.persistence.hibernate.dialect>
-		<app.persistence.hibernate.hbm2ddl.auto>create-drop</app.persistence.hibernate.hbm2ddl.auto>
-		<app.persistence.hibernate.show_sql>true</app.persistence.hibernate.show_sql>		
+		<version.dependency.plugin>2.1</version.dependency.plugin>
 	</properties>
 
+	<modules>
+		<module>app</module>
+		<!--module>api</module-->
+	</modules>
+
+	<repositories>
+	</repositories>
+
 	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.wildfly.bom</groupId>
-				<artifactId>jboss-javaee-7.0-with-hibernate</artifactId>
-				<version>${version.jboss.bom}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+		<dependencies>			
 		</dependencies>
 	</dependencyManagement>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.jboss.spec.javax.annotation</groupId>
-			<artifactId>jboss-annotations-api_1.2_spec</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.enterprise</groupId>
-			<artifactId>cdi-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- dependency> <groupId>org.jboss.resteasy</groupId> <artifactId>jaxrs-api</artifactId> 
-			<scope>provided</scope> </dependency -->
-
-		<dependency>
-			<groupId>org.jboss.spec.javax.ejb</groupId>
-			<artifactId>jboss-ejb-api_3.2_spec</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hibernate.javax.persistence</groupId>
-			<artifactId>hibernate-jpa-2.1-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>com.enigmabridge</groupId>
-			<artifactId>hibernate4-sqlite-dialect</artifactId>
-			<version>0.1.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jboss.spec.javax.faces</groupId>
-			<artifactId>jboss-jsf-api_2.2_spec</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- Logging -->
-		<!-- dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
-			<version>${org.slf4j-version}</version> </dependency -->
-		<!-- Quartz -->
-		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz-jobs</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-	</dependencies>
-
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${version.compiler.plugin}</version>
+					<configuration>
+						<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
+						<compilerArguments>
+							<endorseddirs>${endorsed.dir}</endorseddirs>
+						</compilerArguments>
+					</configuration>
+				</plugin>
+
+				<!--Gera algumas informações no arquivo MANIFEST.MF do projeto -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${version.jar.plugin}</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+								<classpathPrefix />
+							</manifest>
+							<manifestEntries>
+								<url>${project.url}</url>
+								<Implementation-Build>${buildNumber}</Implementation-Build>
+								<Implementation-Title>${project.name}</Implementation-Title>
+								<Implementation-Vendor>N/A</Implementation-Vendor>
+								<Implementation-Version>${project.version}</Implementation-Version>
+								<Built-By>${user.name}</Built-By>
+								<Built-OS>${os.name}</Built-OS>
+								<Build-Date>${timestamp}</Build-Date>
+								<SCM>${buildNumber}</SCM>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>${version.war.plugin}</version>
+					<configuration>
+						<failOnMissingWebXml>false</failOnMissingWebXml>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+								<classpathPrefix />
+							</manifest>
+							<manifestEntries>
+								<url>${project.url}</url>
+								<Implementation-Build>${buildNumber}</Implementation-Build>
+								<Implementation-Title>${project.name}</Implementation-Title>
+								<Implementation-Vendor>N/A</Implementation-Vendor>
+								<Implementation-Version>${project.version}</Implementation-Version>
+								<Built-By>${user.name}</Built-By>
+								<Built-OS>${os.name}</Built-OS>
+								<Build-Date>${timestamp}</Build-Date>
+								<SCM>${buildNumber}</SCM>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>		
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>${version.dependency.plugin}</version>
+					<executions>
+						<execution>
+							<phase>validate</phase>
+							<goals>
+								<goal>copy</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${endorsed.dir}</outputDirectory>
+								<silent>true</silent>
+								<artifactItems>
+									<artifactItem>
+										<groupId>javax</groupId>
+										<artifactId>javaee-endorsed-api</artifactId>
+										<version>7.0</version>
+										<type>jar</type>
+									</artifactItem>
+								</artifactItems>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
 		<plugins>
+			<!--Gera informações do controle de versão -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${version.compiler.plugin}</version>
-				<configuration>
-					<source>${maven.compiler.source}</source>
-					<target>${maven.compiler.target}</target>
-					<compilerArguments>
-						<endorseddirs>${endorsed.dir}</endorseddirs>
-					</compilerArguments>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>${version.war.plugin}</version>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<warName>quartz-demo</warName>
-					<webResources>
-						<resource>
-							<directory>src/main/webapp</directory>
-							<filtering>true</filtering>
-							<includes>
-								<include>WEB-INF/*.xml</include>
-							</includes>
-						</resource>
-					</webResources>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.1</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.4</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
 						<goals>
-							<goal>copy</goal>
+							<goal>create</goal>
 						</goals>
-						<configuration>
-							<outputDirectory>${endorsed.dir}</outputDirectory>
-							<silent>true</silent>
-							<artifactItems>
-								<artifactItem>
-									<groupId>javax</groupId>
-									<artifactId>javaee-endorsed-api</artifactId>
-									<version>7.0</version>
-									<type>jar</type>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+
+			<!--Cria os arquivos de configuração do Eclipse -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 
-	<profiles>
-		<profile>
-			<id>unix</id>
-			<activation>
-				<os>
-					<family>unix</family>
-					<name>Linux</name>
-				</os>
-			</activation>
-			<properties>
-				<app.datasource.h2.connection.url>jdbc:h2:file:/home/vagrant/github/quartz-jee-demo/db/quartz_jee_demo.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url>
-				<app.datasource.sqlite.connection.url>jdbc:sqlite:/home/vagrant/github/quartz-jee-demo/db/quartz_jee_demo.sqlite</app.datasource.sqlite.connection.url>
-
-				<!-- app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source>
-				<app.persistence.hibernate.dialect>org.hibernate.dialect.H2Dialect</app.persistence.hibernate.dialect-->
-			</properties>
-		</profile>
+	<profiles>		
 	</profiles>
 </project>
