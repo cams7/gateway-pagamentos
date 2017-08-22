@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+	<Resource auth="Container" driverClassName="${db.driverClassName}"
+		factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory"
+		maxTotal="50" maxIdle="10" maxWaitMillis="-1" name="jdbc/app"
+		type="javax.sql.DataSource" url="${db.connection.url}" username="${db.username}"
+		password="${db.password}" />
+</Context>

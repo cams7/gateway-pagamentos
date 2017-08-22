@@ -24,6 +24,8 @@ import org.quartz.spi.JobFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import br.com.cams7.app.model.entity.Order.PaymentMethod;
+
 @Startup
 @Singleton
 public class SchedulerBean {
@@ -47,24 +49,27 @@ public class SchedulerBean {
 			final String BANK_SLIP_JOB = "boleto-bancario-job";
 
 			// Processa pagamento à vista
-			JobDetail downPaymentJob = JobBuilder.newJob(DownPaymentJob.class)
+			JobDetail downPaymentJob = JobBuilder.newJob(ProcessPaymentJob.class)
 					.withIdentity(JobKey.jobKey("job1", DOWN_PAYMENT_JOB)).build();
+			downPaymentJob.getJobDataMap().put(ProcessPaymentJob.PAYMENT_METHOD, PaymentMethod.DOWN_PAYMENT);
 
 			Trigger downPaymentTrigger = TriggerBuilder.newTrigger()
 					.withIdentity(TriggerKey.triggerKey("conta-corrente-trigger", DOWN_PAYMENT_JOB)).startNow()
 					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(10)).build();
 
 			// Processa pagamento no cartão de credito
-			JobDetail credidCardJob = JobBuilder.newJob(CredidCardJob.class)
+			JobDetail credidCardJob = JobBuilder.newJob(ProcessPaymentJob.class)
 					.withIdentity(JobKey.jobKey("job2", CREDID_CARD_JOB)).build();
+			credidCardJob.getJobDataMap().put(ProcessPaymentJob.PAYMENT_METHOD, PaymentMethod.CREDIT_CARD);
 
 			Trigger credidCardTrigger = TriggerBuilder.newTrigger()
 					.withIdentity(TriggerKey.triggerKey("cartao-credito-trigger", CREDID_CARD_JOB)).startNow()
 					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(30)).build();
 
 			// Processa pagamento no boleto bancário
-			JobDetail bankSlipJob = JobBuilder.newJob(BankSlipJob.class)
+			JobDetail bankSlipJob = JobBuilder.newJob(ProcessPaymentJob.class)
 					.withIdentity(JobKey.jobKey("job3", BANK_SLIP_JOB)).build();
+			bankSlipJob.getJobDataMap().put(ProcessPaymentJob.PAYMENT_METHOD, PaymentMethod.BANK_SLIP);
 
 			Trigger bankSlipTrigger = TriggerBuilder.newTrigger()
 					.withIdentity(TriggerKey.triggerKey("boleto-bancario-trigger", BANK_SLIP_JOB)).startNow()

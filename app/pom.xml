@@ -15,25 +15,25 @@
 
 	<properties>		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+		
 		<version.jboss.bom>8.0.0.Final</version.jboss.bom>
 
-		<org.slf4j-version>1.7.7</org.slf4j-version>
-
-		<app.quartz.datasource.connection.url>jdbc:mysql://localhost:3306/quartz_jee_demo</app.quartz.datasource.connection.url>
+		<!--app.quartz.datasource.connection.url>jdbc:mysql://localhost:3306/quartz_jee_demo</app.quartz.datasource.connection.url>
 		<app.quartz.datasource.driver>mysql</app.quartz.datasource.driver>
 		<app.quartz.datasource.username>quartz</app.quartz.datasource.username>
 		<app.quartz.datasource.password>demo</app.quartz.datasource.password>
 		<app.quartz.dataSource>JtaMySqlDS</app.quartz.dataSource>
 		<app.quartz.nonManagedTXDataSource>MySqlDS</app.quartz.nonManagedTXDataSource>
 		<app.quartz.dataSource.jndiURL>java:jboss/datasources/${app.quartz.dataSource}</app.quartz.dataSource.jndiURL>
-		<app.quartz.nonManagedTXDataSource.jndiURL>java:jboss/datasources/${app.quartz.nonManagedTXDataSource}</app.quartz.nonManagedTXDataSource.jndiURL>
+		<app.quartz.nonManagedTXDataSource.jndiURL>java:jboss/datasources/${app.quartz.nonManagedTXDataSource}</app.quartz.nonManagedTXDataSource.jndiURL-->
 
-		<app.datasource.h2.connection.url>jdbc:h2:file:/Dev/Vagrant/teste/github/gateway-pagamentos/app/db/quartz_jee_demo.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url>
+		<app.database>app</app.database>
+	
+		<!--app.datasource.h2.connection.url>jdbc:h2:file:/Dev/Vagrant/teste/github/gateway-pagamentos/app/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url>
 		<app.datasource.h2.username>sa</app.datasource.h2.username>
-		<app.datasource.h2.password>sa</app.datasource.h2.password>
+		<app.datasource.h2.password>sa</app.datasource.h2.password-->
 
-		<app.datasource.sqlite.connection.url>jdbc:sqlite:/Dev/Vagrant/teste/github/gateway-pagamentos/app/db/quartz_jee_demo.sqlite</app.datasource.sqlite.connection.url>
+		<app.datasource.sqlite.connection.url>jdbc:sqlite:/Dev/Vagrant/teste/github/gateway-pagamentos/app/db/${app.database}.sqlite</app.datasource.sqlite.connection.url>
 
 		<!-- app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source>
 		<app.persistence.hibernate.dialect>org.hibernate.dialect.H2Dialect</app.persistence.hibernate.dialect-->
@@ -42,7 +42,7 @@
 		<app.persistence.hibernate.hbm2ddl.auto>create-drop</app.persistence.hibernate.hbm2ddl.auto>
 		<app.persistence.hibernate.show_sql>true</app.persistence.hibernate.show_sql>		
 	</properties>
-
+	
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -55,13 +55,7 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<dependencies>
-		<dependency>
-            <groupId>org.jboss.spec.javax.servlet</groupId>
-            <artifactId>jboss-servlet-api_3.1_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        
+	<dependencies>        
 		<dependency>
 			<groupId>org.jboss.spec.javax.annotation</groupId>
 			<artifactId>jboss-annotations-api_1.2_spec</artifactId>
@@ -117,9 +111,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Logging -->
-		<!-- dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
-			<version>${org.slf4j-version}</version> </dependency -->
 		<!-- Quartz -->
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
@@ -131,30 +122,26 @@
 			<artifactId>quartz-jobs</artifactId>
 			<version>2.2.1</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpcore</artifactId>
+		    <version>4.4.6</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.5.3</version>
+		</dependency>
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
 		<plugins>	
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-					<warName>gateway-pagamentos-app</warName>
-					<webResources>
-						<resource>
-							<directory>src/main/webapp</directory>
-							<filtering>true</filtering>
-							<includes>
-								<include>WEB-INF/*.xml</include>
-							</includes>
-						</resource>
-					</webResources>
+					<warName>gateway-pagamentos-app</warName>					
 				</configuration>
 			</plugin>
 		</plugins>
@@ -170,8 +157,8 @@
 				</os>
 			</activation>
 			<properties>
-				<app.datasource.h2.connection.url>jdbc:h2:file:/vagrant/github/gateway-pagamentos/app/db/quartz_jee_demo.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url>
-				<app.datasource.sqlite.connection.url>jdbc:sqlite:/vagrant/github/gateway-pagamentos/app/db/quartz_jee_demo.sqlite</app.datasource.sqlite.connection.url>
+				<!--app.datasource.h2.connection.url>jdbc:h2:file:/vagrant/github/gateway-pagamentos/app/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url!-->
+				<app.datasource.sqlite.connection.url>jdbc:sqlite:/vagrant/github/gateway-pagamentos/app/db/${app.database}.sqlite</app.datasource.sqlite.connection.url>
 
 				<!-- app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source>
 				<app.persistence.hibernate.dialect>org.hibernate.dialect.H2Dialect</app.persistence.hibernate.dialect-->

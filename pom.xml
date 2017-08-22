@@ -28,23 +28,22 @@
 		<version.compiler.plugin>2.3.2</version.compiler.plugin>
 		<version.jar.plugin>2.6</version.jar.plugin>
 		<version.war.plugin>2.1.1</version.war.plugin>
-		<version.dependency.plugin>2.1</version.dependency.plugin>
+		<version.dependency.plugin>2.1</version.dependency.plugin>		
 	</properties>
 
 	<modules>
 		<module>app</module>
-		<!--module>api</module-->
+		<module>api</module>
 	</modules>
 
-	<repositories>
-	</repositories>
-
-	<dependencyManagement>
-		<dependencies>			
-		</dependencies>
-	</dependencyManagement>
-
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -92,6 +91,16 @@
 					<version>${version.war.plugin}</version>
 					<configuration>
 						<failOnMissingWebXml>false</failOnMissingWebXml>
+						<webResources>
+							<resource>
+								<directory>src/main/webapp</directory>
+								<filtering>true</filtering>
+								<includes>
+									<include>META-INF/*.xml</include>
+									<include>WEB-INF/*.xml</include>
+								</includes>
+							</resource>
+						</webResources>
 						<archive>
 							<manifest>
 								<addClasspath>true</addClasspath>
