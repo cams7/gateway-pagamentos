@@ -5,13 +5,10 @@ package br.com.cams7.app.controller;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
-import java.util.Random;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.enterprise.inject.Model;
-//import javax.enterprise.inject.Model;
 import javax.enterprise.inject.Produces;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -21,8 +18,8 @@ import javax.inject.Named;
 import br.com.cams7.app.model.OrderRepository;
 import br.com.cams7.app.model.entity.Customer;
 import br.com.cams7.app.model.entity.Order;
-import br.com.cams7.app.model.entity.Order.OrderStatus;
 import br.com.cams7.app.model.entity.Order.PaymentMethod;
+import br.com.cams7.app.model.entity.Order.PaymentStatus;
 
 /**
  * @author cesaram
@@ -40,6 +37,8 @@ public class OrderController implements Serializable {
 
 	private Order newOrder;
 
+	private Long customerId;
+
 	@Produces
 	@Named
 	public Order getNewOrder() {
@@ -48,6 +47,7 @@ public class OrderController implements Serializable {
 
 	public void register() {
 		try {
+			newOrder.setCustomer(new Customer(getCustomerId()));
 			orderRepository.register(newOrder);
 			facesContext.addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "Cadastrado!", "Cadastrado com sucesso"));
@@ -63,26 +63,15 @@ public class OrderController implements Serializable {
 	@PostConstruct
 	public void initNewOrder() {
 		newOrder = new Order();
-		newOrder.setCustomer(new Customer(getCustomerId()));
-		newOrder.setOrderStatus(OrderStatus.PENDING);
 		newOrder.setOrderDate(new Date());
-		int random = new Random().nextInt(PaymentMethod.values().length - 1);
-		newOrder.setPaymentMethod(PaymentMethod.values()[random]);
-	}
-
-	public Long getCustomerId() {
-		Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
-		String param = params.get("c");
-		Long customerId = Long.valueOf(param);
-		return customerId;
 	}
 
 	public PaymentMethod[] getPaymentMethods() {
 		return PaymentMethod.values();
 	}
 
-	public OrderStatus[] getOrderStatus() {
-		return OrderStatus.values();
+	public PaymentStatus[] getOrderStatus() {
+		return PaymentStatus.values();
 	}
 
 	private String getRootErrorMessage(Exception e) {
@@ -102,6 +91,14 @@ public class OrderController implements Serializable {
 		}
 		// This is the root cause message
 		return errorMessage;
+	}
+
+	public Long getCustomerId() {
+		return customerId;
+	}
+
+	public void setCustomerId(Long customerId) {
+		this.customerId = customerId;
 	}
 
 }

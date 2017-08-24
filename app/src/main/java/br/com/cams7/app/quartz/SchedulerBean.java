@@ -44,42 +44,63 @@ public class SchedulerBean {
 			scheduler = new StdSchedulerFactory().getScheduler();
 			scheduler.setJobFactory(jobFactory);
 
-			final String DOWN_PAYMENT_JOB = "conta-corrente-job";
+			final String UNVERIFIED_PAYMENT_JOB = "pagamento-nao-verificado-job";
+			final String PAYMENT_NOT_CHOSEN_JOB = "pagamento-nao-escolhido-job";
+			final String CASH_PAYMENT_JOB = "pagamento-a-vista-job";
 			final String CREDID_CARD_JOB = "cartao-credito-job";
-			final String BANK_SLIP_JOB = "boleto-bancario-job";
+			final String PAYMENT_SLIP_JOB = "boleto-bancario-job";
+
+			// Processa pagamento não verificado
+			JobDetail unverifiedPaymentJob = JobBuilder.newJob(ProcessUnverifiedPaymentJob.class)
+					.withIdentity(JobKey.jobKey("job1", UNVERIFIED_PAYMENT_JOB)).build();
+
+			Trigger unverifiedPaymentTrigger = TriggerBuilder.newTrigger()
+					.withIdentity(TriggerKey.triggerKey("pagamento-nao-verificado-trigger", UNVERIFIED_PAYMENT_JOB))
+					.startNow().withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(10)).build();
+
+			// Processa pagamento não escolhido
+			JobDetail notChosenJob = JobBuilder.newJob(ProcessPendingPaymentJob.class)
+					.withIdentity(JobKey.jobKey("job2", PAYMENT_NOT_CHOSEN_JOB)).build();
+			notChosenJob.getJobDataMap().put(ProcessPendingPaymentJob.PAYMENT_METHOD, PaymentMethod.PAYMENT_NOT_CHOSEN);
+
+			Trigger notChosenTrigger = TriggerBuilder.newTrigger()
+					.withIdentity(TriggerKey.triggerKey("pagamento-nao-escolhido-trigger", PAYMENT_NOT_CHOSEN_JOB))
+					.startNow().withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(10)).build();
 
 			// Processa pagamento à vista
-			JobDetail downPaymentJob = JobBuilder.newJob(ProcessPaymentJob.class)
-					.withIdentity(JobKey.jobKey("job1", DOWN_PAYMENT_JOB)).build();
-			downPaymentJob.getJobDataMap().put(ProcessPaymentJob.PAYMENT_METHOD, PaymentMethod.DOWN_PAYMENT);
+			JobDetail cashPaymentJob = JobBuilder.newJob(ProcessPendingPaymentJob.class)
+					.withIdentity(JobKey.jobKey("job3", CASH_PAYMENT_JOB)).build();
+			cashPaymentJob.getJobDataMap().put(ProcessPendingPaymentJob.PAYMENT_METHOD, PaymentMethod.CASH_PAYMENT);
 
-			Trigger downPaymentTrigger = TriggerBuilder.newTrigger()
-					.withIdentity(TriggerKey.triggerKey("conta-corrente-trigger", DOWN_PAYMENT_JOB)).startNow()
-					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(10)).build();
+			Trigger cashPaymentTrigger = TriggerBuilder.newTrigger()
+					.withIdentity(TriggerKey.triggerKey("pagamento-a-vista-trigger", CASH_PAYMENT_JOB)).startNow()
+					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(30)).build();
 
 			// Processa pagamento no cartão de credito
-			JobDetail credidCardJob = JobBuilder.newJob(ProcessPaymentJob.class)
-					.withIdentity(JobKey.jobKey("job2", CREDID_CARD_JOB)).build();
-			credidCardJob.getJobDataMap().put(ProcessPaymentJob.PAYMENT_METHOD, PaymentMethod.CREDIT_CARD);
+			JobDetail credidCardJob = JobBuilder.newJob(ProcessPendingPaymentJob.class)
+					.withIdentity(JobKey.jobKey("job3", CREDID_CARD_JOB)).build();
+			credidCardJob.getJobDataMap().put(ProcessPendingPaymentJob.PAYMENT_METHOD, PaymentMethod.CREDIT_CARD);
 
 			Trigger credidCardTrigger = TriggerBuilder.newTrigger()
 					.withIdentity(TriggerKey.triggerKey("cartao-credito-trigger", CREDID_CARD_JOB)).startNow()
-					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(30)).build();
+					.withSchedule(SimpleScheduleBuilder.repeatMinutelyForever()).build();
 
 			// Processa pagamento no boleto bancário
-			JobDetail bankSlipJob = JobBuilder.newJob(ProcessPaymentJob.class)
-					.withIdentity(JobKey.jobKey("job3", BANK_SLIP_JOB)).build();
-			bankSlipJob.getJobDataMap().put(ProcessPaymentJob.PAYMENT_METHOD, PaymentMethod.BANK_SLIP);
+			JobDetail paymentSlipJob = JobBuilder.newJob(ProcessPendingPaymentJob.class)
+					.withIdentity(JobKey.jobKey("job4", PAYMENT_SLIP_JOB)).build();
+			paymentSlipJob.getJobDataMap().put(ProcessPendingPaymentJob.PAYMENT_METHOD, PaymentMethod.PAYMENT_SLIP);
 
-			Trigger bankSlipTrigger = TriggerBuilder.newTrigger()
-					.withIdentity(TriggerKey.triggerKey("boleto-bancario-trigger", BANK_SLIP_JOB)).startNow()
-					.withSchedule(SimpleScheduleBuilder.repeatMinutelyForever()).build();
+			Trigger paymentSlipTrigger = TriggerBuilder.newTrigger()
+					.withIdentity(TriggerKey.triggerKey("boleto-bancario-trigger", PAYMENT_SLIP_JOB)).startNow()
+					.withSchedule(SimpleScheduleBuilder.repeatHourlyForever()).build();
 
 			scheduler.start(); // starting a scheduler before scheduling jobs helped in getting rid of deadlock
 								// on startup
-			scheduler.scheduleJob(downPaymentJob, newHashSet(downPaymentTrigger), true);
+			scheduler.scheduleJob(unverifiedPaymentJob, newHashSet(unverifiedPaymentTrigger), true);
+			scheduler.scheduleJob(notChosenJob, newHashSet(notChosenTrigger), true);
+			scheduler.scheduleJob(cashPaymentJob, newHashSet(cashPaymentTrigger), true);
 			scheduler.scheduleJob(credidCardJob, newHashSet(credidCardTrigger), true);
-			scheduler.scheduleJob(bankSlipJob, newHashSet(bankSlipTrigger), true);
+			scheduler.scheduleJob(paymentSlipJob, newHashSet(paymentSlipTrigger), true);
 
 			printJobsAndTriggers(scheduler);
 		} catch (SchedulerException e) {

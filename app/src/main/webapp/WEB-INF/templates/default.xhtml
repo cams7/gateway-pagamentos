@@ -22,15 +22,14 @@
 <h:head>
 	<title>Gateway de Pagamentos</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<h:outputStylesheet name="css/screen.css" />
+	<h:outputStylesheet library="css" name="screen.css" />
+	<h:outputScript library="js" name="app.js" />
 </h:head>
 <h:body>
 	<div id="container">
 		<div id="content">
-			<ui:insert name="content">
-			</ui:insert>
+			<ui:insert name="content" />
 		</div>
-		<div id="footer"></div>
 	</div>
 </h:body>
 </html>

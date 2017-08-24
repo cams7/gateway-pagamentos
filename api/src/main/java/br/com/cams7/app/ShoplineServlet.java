@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -43,7 +45,6 @@ public class ShoplineServlet extends HttpServlet {
 
 	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		final String DC = request.getParameter("DC");
-		System.out.println("DC: " + DC);
 
 		final String PARAM_COD_PEDIDO = "Pedido";
 		final String PARAM_COD_EMP = "CodEmp";
@@ -53,24 +54,26 @@ public class ShoplineServlet extends HttpServlet {
 		String codigoEmpresa = getParam(request.getParameter(PARAM_COD_EMP), DC, 1);
 		String valorPedido = getParam(request.getParameter(PARAM_VALOR), DC, 2);
 
-		System.out.println("Empresa: " + codigoEmpresa + ", pedido: " + codigoPedido + ", valor: " + valorPedido);
-
-		final String BUTTON_DOWN_PAYMENT = "Á vista";
-		final String BUTTON_CREDIT_CARD = "Cartão";
-		final String BUTTON_BANK_SLIP = "Boleto";
+		final String BUTTON_NOT_CHOSEN = "Não escolhido";
+		final String BUTTON_CASH_PAYMENT = "À vista";
+		final String BUTTON_PAYMENT_SLIP = "Boleto";
+		final String BUTTON_CREDIT_CARD = "Cartão de crédito";
 
 		String action = request.getParameter("action");
 
 		if (action != null)
 			switch (action) {
-			case BUTTON_DOWN_PAYMENT:
-				downPaymentProcess(codigoPedido, codigoEmpresa, valorPedido);
+			case BUTTON_CASH_PAYMENT:
+				cashPaymentProcess(codigoPedido, codigoEmpresa, valorPedido);
+				break;
+			case BUTTON_PAYMENT_SLIP:
+				paymentSlipProcess(codigoPedido, codigoEmpresa, valorPedido);
 				break;
 			case BUTTON_CREDIT_CARD:
 				creditCardProcess(codigoPedido, codigoEmpresa, valorPedido);
 				break;
 			default:
-				bankSlipProcess(codigoPedido, codigoEmpresa, valorPedido);
+				notChosenProcess(codigoPedido, codigoEmpresa, valorPedido);
 				break;
 			}
 
@@ -108,9 +111,10 @@ public class ShoplineServlet extends HttpServlet {
 		out.println("</TABLE>");
 		out.println("</DIV>");
 		out.println("<DIV>");
-		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_DOWN_PAYMENT + "\">");
+		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_NOT_CHOSEN + "\">");
+		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_CASH_PAYMENT + "\">");
+		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_PAYMENT_SLIP + "\">");
 		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_CREDIT_CARD + "\">");
-		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_BANK_SLIP + "\">");
 		out.println("</DIV>");
 		out.println("</FORM>");
 		out.println("</body>");
@@ -129,52 +133,45 @@ public class ShoplineServlet extends HttpServlet {
 		return param;
 	}
 
-	private void downPaymentProcess(String codigoPedido, String codigoEmpresa, String valorPedido) {
-		addPayment(codigoPedido, codigoEmpresa, valorPedido, "00");
+	private void notChosenProcess(String codigoPedido, String codigoEmpresa, String valorPedido) {
+		String[] situacoes = new String[] { "01", "02", "03" };
+		addPayment(codigoPedido, codigoEmpresa, valorPedido, "00",
+				situacoes[new Random().nextInt(situacoes.length - 1)]);
+
+	}
+
+	private void cashPaymentProcess(String codigoPedido, String codigoEmpresa, String valorPedido) {
+		String[] situacoes = new String[] { "00", "01", "02", "03" };
+		addPayment(codigoPedido, codigoEmpresa, valorPedido, "01",
+				situacoes[new Random().nextInt(situacoes.length - 1)]);
+	}
+
+	private void paymentSlipProcess(String codigoPedido, String codigoEmpresa, String valorPedido) {
+		String[] situacoes = new String[] { "00", "01", "02", "03", "04", "05", "06" };
+		addPayment(codigoPedido, codigoEmpresa, valorPedido, "02",
+				situacoes[new Random().nextInt(situacoes.length - 1)]);
+
 	}
 
 	private void creditCardProcess(String codigoPedido, String codigoEmpresa, String valorPedido) {
-		addPayment(codigoPedido, codigoEmpresa, valorPedido, "01");
+		String[] situacoes = new String[] { "00", "01", "02", "03" };
+		addPayment(codigoPedido, codigoEmpresa, valorPedido, "03",
+				situacoes[new Random().nextInt(situacoes.length - 1)]);
 	}
 
-	private void bankSlipProcess(String codigoPedido, String codigoEmpresa, String valorPedido) {
-		addPayment(codigoPedido, codigoEmpresa, valorPedido, "02");
+	private void addPayment(String codigoPedido, String codigoEmpresa, String valorPedido, String tipoPagamento,
+			String situacaoPagamento) {
 
-	}
-
-	private void addPayment(String codigoPedido, String codigoEmpresa, String valorPedido, String tipoPagamento) {
 		Connection conn = null;
 		try {
-			// conn = DriverManager.getConnection(URL);
 			Context ctx = new InitialContext();
 			DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/app");
 			conn = ds.getConnection();
 
-			String situacaoPagamento = "00";
-			String dataPagamento = new SimpleDateFormat("ddMMyyyy").format(new Date());
-
-			PreparedStatement ps = null;
-			try {
-
-				ps = conn.prepareStatement(
-						"insert into PEDIDO (COD_PEDIDO, COD_EMP, COD_EMP, TIP_PAG, SIT_PAG, DT_PAG) VALUES(?, ?, ?, ?, ?, ?)");
-
-				ps.setString(1, codigoPedido);
-				ps.setString(2, codigoEmpresa);
-				ps.setDouble(3, Double.valueOf(valorPedido));
-				ps.setString(4, tipoPagamento);
-				ps.setString(5, situacaoPagamento);
-				ps.setString(6, dataPagamento);
-
-				// execute insert SQL stetement
-				ps.executeUpdate();
-
-				System.out.println("Record is inserted into DBUSER table!");
-			} finally {
-				if (ps != null) {
-					ps.close();
-				}
-			}
+			if (!existsPayment(conn, codigoPedido))
+				addPayment(conn, codigoPedido, codigoEmpresa, valorPedido, tipoPagamento, situacaoPagamento);
+			else
+				System.out.println("O pagamento já foi cadastrado anteriormente");
 
 		} catch (SQLException | NamingException e) {
 			System.err.println(e.getMessage());
@@ -187,6 +184,55 @@ public class ShoplineServlet extends HttpServlet {
 			}
 		}
 
+	}
+
+	private void addPayment(Connection conn, String codigoPedido, String codigoEmpresa, String valorPedido,
+			String tipoPagamento, String situacaoPagamento) throws SQLException {
+		String dataPagamento = new SimpleDateFormat("ddMMyyyy").format(new Date());
+
+		PreparedStatement ps = null;
+		try {
+
+			ps = conn.prepareStatement(
+					"insert into PEDIDO (COD_PEDIDO, COD_EMP, VALOR, TIP_PAG, SIT_PAG, DT_PAG) VALUES(?, ?, ?, ?, ?, ?)");
+
+			ps.setString(1, codigoPedido);
+			ps.setString(2, codigoEmpresa);
+			ps.setDouble(3, Double.valueOf(valorPedido));
+			ps.setString(4, tipoPagamento);
+			ps.setString(5, situacaoPagamento);
+			ps.setString(6, dataPagamento);
+
+			// execute insert SQL stetement
+			ps.executeUpdate();
+
+			System.out.println("Record is inserted into DBUSER table!");
+		} finally {
+			if (ps != null) {
+				ps.close();
+			}
+		}
+	}
+
+	private boolean existsPayment(Connection conn, String codigoPedido) throws SQLException {
+		PreparedStatement ps = null;
+		try {
+
+			ps = conn.prepareStatement("select count(p.COD_PEDIDO) from PEDIDO p where p.COD_PEDIDO = ?");
+			ps.setString(1, codigoPedido);
+
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next())
+				return rs.getInt(1) > 0;
+
+		} finally {
+			if (ps != null) {
+				ps.close();
+			}
+		}
+
+		return false;
 	}
 
 }

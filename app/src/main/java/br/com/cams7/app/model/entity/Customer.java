@@ -29,9 +29,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
-
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "cliente")
@@ -48,13 +45,6 @@ public class Customer implements Serializable {
 	@Pattern(regexp = "[A-Za-z ]*", message = "must contain only letters and spaces")
 	@Column(name = "cliente_nome")
 	private String name;
-
-	/** using hibernate4 validators **/
-	@NotNull
-	@NotEmpty
-	@Email
-	@Column(name = "cliente_email")
-	private String email;
 
 	public Customer() {
 		super();
@@ -79,14 +69,6 @@ public class Customer implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 }

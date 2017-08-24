@@ -3,9 +3,10 @@
  */
 package br.com.cams7.app.model;
 
-import java.text.SimpleDateFormat;
+import static br.com.cams7.app.model.entity.Order.PaymentStatus.PROCESSING_ERROR;
+import static br.com.cams7.app.model.entity.Order.PaymentStatus.UNFINISHED_PAYMENT;
+
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
@@ -26,9 +27,6 @@ import br.com.cams7.app.model.entity.Order.PaymentMethod;
  */
 @Stateless
 public class OrderRepositoryImpl implements OrderRepository {
-
-	@Inject
-	private Logger log;
 
 	@Inject
 	private EntityManager em;
@@ -67,13 +65,37 @@ public class OrderRepositoryImpl implements OrderRepository {
 	}
 
 	@Override
-	public Order findByPaymentMethod(PaymentMethod paymentMethod) {
+	public Order findUnverifiedOrder() {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Order> cq = cb.createQuery(Order.class);
 
 		Root<Order> from = cq.from(Order.class);
 		cq.select(from);
-		cq.where(cb.equal(from.get("paymentMethod"), paymentMethod));
+		cq.where(cb.and(cb.isNull(from.get("paymentMethod")), cb.isNull(from.get("paymentStatus"))));
+		cq.groupBy(from.<Number>get("id"));
+		cq.having(cb.equal(from.get("id"), cb.min(from.<Number>get("id"))));
+
+		try {
+			TypedQuery<Order> tq = em.createQuery(cq);
+			Order order = tq.getSingleResult();
+			return order;
+		} catch (NoResultException e) {
+
+		}
+
+		return null;
+	}
+
+	@Override
+	public Order findPendingPayment(PaymentMethod paymentMethod) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Order> cq = cb.createQuery(Order.class);
+
+		Root<Order> from = cq.from(Order.class);
+		cq.select(from);
+		cq.where(cb.and(cb.equal(from.get("paymentMethod"), paymentMethod),
+				cb.or(cb.equal(from.get("paymentStatus"), UNFINISHED_PAYMENT),
+						cb.equal(from.get("paymentStatus"), PROCESSING_ERROR))));
 		cq.groupBy(from.<Number>get("id"));
 		cq.having(cb.equal(from.get("id"), cb.min(from.<Number>get("id"))));
 
@@ -97,12 +119,14 @@ public class OrderRepositoryImpl implements OrderRepository {
 	 */
 	@Override
 	public void register(Order order) {
-		log.info(String.format("Registering %s",
-				new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(order.getOrderDate())));
-
 		em.persist(order);
 
 		orderEventSrc.fire(order);
+	}
+
+	@Override
+	public void update(Order order) {
+		em.merge(order);
 	}
 
 }

@@ -3,21 +3,22 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
 	template="/WEB-INF/templates/default.xhtml">
-	
+
+	<f:metadata>
+		<f:viewParam name="c" value="#{orderController.customerId}" />
+	</f:metadata>
+
 	<ui:define name="content">
 		<h1>Pedido</h1>
 
 		<h:form id="reg">
 			<h2>Cadastro de pedido</h2>
 			<h:panelGrid columns="3" columnClasses="titleCell">
-				<h:outputLabel for="amount" value="Quantidade:" />
-				<h:inputText id="amount" value="#{newOrder.amount}" />
-				<h:message for="amount" errorClass="invalid" />
-
-				<h:outputLabel for="cost" value="Custo:" />
-				<h:inputText id="cost" value="#{newOrder.cost}" />
-				<h:message for="cost" errorClass="invalid" />
+				<h:outputLabel for="orderValue" value="Custo:" />
+				<h:inputText id="orderValue" value="#{newOrder.orderValue}" />
+				<h:message for="orderValue" errorClass="invalid" />
 
 				<h:outputLabel for="orderDate" value="Data:" />
 				<h:inputText id="orderDate" value="#{newOrder.orderDate}"
@@ -25,30 +26,12 @@
 					<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
 				</h:inputText>
 				<h:message for="orderDate" errorClass="invalid" />
-
-				<!-- h:outputLabel for="paymentMethod" value="Forma de pagamento:" />
-				<h:selectManyListbox id="paymentMethod"
-					value="#{newOrder.paymentMethod}"
-					converter="paymentMethodConverter">
-					<f:selectItems value="#{orderController.paymentMethods}" />
-				</h:selectManyListbox>
-				<h:message for="paymentMethod" errorClass="invalid" />
-
-				<h:outputLabel for="orderStatus" value="Situação:" />
-				<h:selectManyListbox id="orderStatus"
-					value="#{newOrder.orderStatus}" converter="orderStatusConverter"
-					readonly="true">
-					<f:selectItems value="#{orderController.orderStatus}" />
-				</h:selectManyListbox>
-				<h:message for="orderStatus" errorClass="invalid" /-->
 			</h:panelGrid>
 
 			<p>
 				<h:panelGrid columns="2">
 					<h:commandButton id="register" action="#{orderController.register}"
-						value="Cadastrar" styleClass="register">
-						<f:param value="#{param['c']}" name="c" />
-					</h:commandButton>
+						value="Cadastrar" styleClass="register" />
 					<h:messages styleClass="messages" errorClass="invalid"
 						infoClass="valid" warnClass="warning" globalOnly="true" />
 				</h:panelGrid>
@@ -58,34 +41,45 @@
 		<h:panelGroup rendered="#{empty orders}">
 			<em>Pedido não cadastrado.</em>
 		</h:panelGroup>
-		<h:dataTable var="o" value="#{orders}" rendered="#{not empty orders}"
+		<p:dataTable var="o" value="#{orders}" rendered="#{not empty orders}"
 			styleClass="simpletablestyle">
-			<h:column>
-				<f:facet name="header">Id</f:facet>
-                #{o.id}
-            </h:column>
-			<h:column>
-				<f:facet name="header">Quantidade</f:facet>
-                #{o.amount}
-            </h:column>
-			<h:column>
-				<f:facet name="header">Custo</f:facet>
-                #{o.cost}
-            </h:column>
-			<h:column>
-				<f:facet name="header">Data</f:facet>
+			<p:column headerText="ID">
+				<h:outputText value="#{o.id}" />
+			</p:column>
+			<p:column headerText="Custo">
+				<h:outputText value="#{o.orderValue}" />
+			</p:column>
+			<p:column headerText="Pago">
+				<h:outputText value="#{o.valuePaid}" />
+			</p:column>
+			<p:column headerText="Data do pedido">
 				<h:outputText value="#{o.orderDate}">
 					<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
 				</h:outputText>
-			</h:column>
-			<h:column>
-				<f:facet name="header">Forma de pagamento</f:facet>
-                #{o.paymentMethod}
-            </h:column>
-			<h:column>
-				<f:facet name="header">Situação</f:facet>
-                #{o.orderStatus}
-            </h:column>
-		</h:dataTable>
+			</p:column>
+			<p:column headerText="Data do pagamento">
+				<h:outputText value="#{o.payDay}">
+					<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Forma de pagamento">
+				<h:outputText value="#{o.paymentMethod}" />
+			</p:column>
+			<p:column headerText="Situação">
+				<h:outputText value="#{o.paymentStatus}" />
+			</p:column>
+			<p:column>
+				<p:commandButton type="button"
+					onclick="openShopline(#{o.id}, #{o.orderValue})" value="Shopline" />
+			</p:column>
+		</p:dataTable>
+
+		<div id="shopline" style="visibility: hidden; display: inline;">
+			<FORM METHOD="POST"
+				ACTION="http://localhost:8090/gateway-pagamentos-api/shopline"
+				onsubmit="carregabrw()" target="SHOPLINE">
+				<INPUT TYPE="hidden" NAME="DC" VALUE="" />
+			</FORM>
+		</div>
 	</ui:define>
 </ui:composition>

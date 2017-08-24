@@ -6,7 +6,7 @@ package br.com.cams7.app.model.converter;
 import javax.faces.convert.EnumConverter;
 import javax.faces.convert.FacesConverter;
 
-import br.com.cams7.app.model.entity.Order.OrderStatus;
+import br.com.cams7.app.model.entity.Order.PaymentStatus;
 
 /**
  * @author cesaram
@@ -15,7 +15,7 @@ import br.com.cams7.app.model.entity.Order.OrderStatus;
 @FacesConverter("orderStatusConverter")
 public class OrderStatusConverter extends EnumConverter {
 	public OrderStatusConverter() {
-		super(OrderStatus.class);
+		super(PaymentStatus.class);
 	}
 
 }

@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>br.com.cams7</groupId>
 		<artifactId>gateway-pagamentos</artifactId>
@@ -13,36 +13,33 @@
 
 	<name>Aplicação de Gateway de pagamentos</name>
 
-	<properties>		
+	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
+
 		<version.jboss.bom>8.0.0.Final</version.jboss.bom>
 
-		<!--app.quartz.datasource.connection.url>jdbc:mysql://localhost:3306/quartz_jee_demo</app.quartz.datasource.connection.url>
-		<app.quartz.datasource.driver>mysql</app.quartz.datasource.driver>
-		<app.quartz.datasource.username>quartz</app.quartz.datasource.username>
-		<app.quartz.datasource.password>demo</app.quartz.datasource.password>
-		<app.quartz.dataSource>JtaMySqlDS</app.quartz.dataSource>
-		<app.quartz.nonManagedTXDataSource>MySqlDS</app.quartz.nonManagedTXDataSource>
-		<app.quartz.dataSource.jndiURL>java:jboss/datasources/${app.quartz.dataSource}</app.quartz.dataSource.jndiURL>
-		<app.quartz.nonManagedTXDataSource.jndiURL>java:jboss/datasources/${app.quartz.nonManagedTXDataSource}</app.quartz.nonManagedTXDataSource.jndiURL-->
+		<!--app.quartz.datasource.connection.url>jdbc:mysql://localhost:3306/quartz_jee_demo</app.quartz.datasource.connection.url> 
+			<app.quartz.datasource.driver>mysql</app.quartz.datasource.driver> <app.quartz.datasource.username>quartz</app.quartz.datasource.username> 
+			<app.quartz.datasource.password>demo</app.quartz.datasource.password> <app.quartz.dataSource>JtaMySqlDS</app.quartz.dataSource> 
+			<app.quartz.nonManagedTXDataSource>MySqlDS</app.quartz.nonManagedTXDataSource> 
+			<app.quartz.dataSource.jndiURL>java:jboss/datasources/${app.quartz.dataSource}</app.quartz.dataSource.jndiURL> 
+			<app.quartz.nonManagedTXDataSource.jndiURL>java:jboss/datasources/${app.quartz.nonManagedTXDataSource}</app.quartz.nonManagedTXDataSource.jndiURL -->
 
 		<app.database>app</app.database>
-	
-		<!--app.datasource.h2.connection.url>jdbc:h2:file:/Dev/Vagrant/teste/github/gateway-pagamentos/app/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url>
-		<app.datasource.h2.username>sa</app.datasource.h2.username>
-		<app.datasource.h2.password>sa</app.datasource.h2.password-->
+
+		<!--app.datasource.h2.connection.url>jdbc:h2:file:/Dev/Vagrant/teste/github/gateway-pagamentos/app/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url> 
+			<app.datasource.h2.username>sa</app.datasource.h2.username> <app.datasource.h2.password>sa</app.datasource.h2.password -->
 
 		<app.datasource.sqlite.connection.url>jdbc:sqlite:/Dev/Vagrant/teste/github/gateway-pagamentos/app/db/${app.database}.sqlite</app.datasource.sqlite.connection.url>
 
-		<!-- app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source>
-		<app.persistence.hibernate.dialect>org.hibernate.dialect.H2Dialect</app.persistence.hibernate.dialect-->
+		<!-- app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source> 
+			<app.persistence.hibernate.dialect>org.hibernate.dialect.H2Dialect</app.persistence.hibernate.dialect -->
 		<app.persistence.jta.data.source>java:jboss/datasources/SQLiteDS</app.persistence.jta.data.source>
 		<app.persistence.hibernate.dialect>com.enigmabridge.hibernate.dialect.SQLiteDialect</app.persistence.hibernate.dialect>
 		<app.persistence.hibernate.hbm2ddl.auto>create-drop</app.persistence.hibernate.hbm2ddl.auto>
-		<app.persistence.hibernate.show_sql>true</app.persistence.hibernate.show_sql>		
+		<app.persistence.hibernate.show_sql>true</app.persistence.hibernate.show_sql>
 	</properties>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -55,7 +52,7 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<dependencies>        
+	<dependencies>
 		<dependency>
 			<groupId>org.jboss.spec.javax.annotation</groupId>
 			<artifactId>jboss-annotations-api_1.2_spec</artifactId>
@@ -122,26 +119,36 @@
 			<artifactId>quartz-jobs</artifactId>
 			<version>2.2.1</version>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpcore</artifactId>
-		    <version>4.4.6</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<!--version>4.4.6</version -->
+			<version>4.2.1</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpclient</artifactId>
-		    <version>4.5.3</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<!--version>4.5.3</version -->
+			<version>4.2.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.primefaces</groupId>
+			<artifactId>primefaces</artifactId>
+			<version>5.3</version>
 		</dependency>
 	</dependencies>
 
 	<build>
-		<plugins>	
+		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-					<warName>gateway-pagamentos-app</warName>					
+					<warName>gateway-pagamentos-app</warName>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -157,11 +164,11 @@
 				</os>
 			</activation>
 			<properties>
-				<!--app.datasource.h2.connection.url>jdbc:h2:file:/vagrant/github/gateway-pagamentos/app/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url!-->
+				<!--app.datasource.h2.connection.url>jdbc:h2:file:/vagrant/github/gateway-pagamentos/app/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</app.datasource.h2.connection.url! -->
 				<app.datasource.sqlite.connection.url>jdbc:sqlite:/vagrant/github/gateway-pagamentos/app/db/${app.database}.sqlite</app.datasource.sqlite.connection.url>
 
-				<!-- app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source>
-				<app.persistence.hibernate.dialect>org.hibernate.dialect.H2Dialect</app.persistence.hibernate.dialect-->
+				<!-- app.persistence.jta.data.source>java:jboss/datasources/H2DS</app.persistence.jta.data.source> 
+					<app.persistence.hibernate.dialect>org.hibernate.dialect.H2Dialect</app.persistence.hibernate.dialect -->
 			</properties>
 		</profile>
 	</profiles>

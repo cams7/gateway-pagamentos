@@ -35,13 +35,10 @@ public class ConsultaServlet extends HttpServlet {
 
 	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		final String DC = request.getParameter("DC");
-		System.out.println("DC: " + DC);
 
 		String codigoPedido = getParam(DC, 0);
 		String codigoEmpresa = getParam(DC, 1);
-		String formado = getParam(DC, 2);
-
-		System.out.println("Empresa: " + codigoEmpresa + ", pedido: " + codigoPedido + ", formato: " + formado);
+//		String formado = getParam(DC, 2);
 
 		response.setContentType("text/xml;charset=UTF-8");
 		PrintWriter out = response.getWriter();
@@ -62,7 +59,7 @@ public class ConsultaServlet extends HttpServlet {
 			DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/app");
 			conn = ds.getConnection();
 
-			System.out.println("Connection to SQLite has been established.");
+			// System.out.println("Connection to SQLite has been established.");
 
 			PreparedStatement ps = null;
 			try {

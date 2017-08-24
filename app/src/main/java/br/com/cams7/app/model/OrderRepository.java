@@ -17,7 +17,11 @@ public interface OrderRepository {
 
 	List<Order> findAllByCustomer(Long customerId);
 
-	Order findByPaymentMethod(PaymentMethod paymentMethod);
+	Order findUnverifiedOrder();
+
+	Order findPendingPayment(PaymentMethod paymentMethod);
 
 	void register(Order order);
+
+	void update(Order order);
 }

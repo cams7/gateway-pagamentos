@@ -13,10 +13,6 @@
 				<h:outputLabel for="name" value="Nome:" />
 				<h:inputText id="name" value="#{newCustomer.name}" />
 				<h:message for="name" errorClass="invalid" />
-
-				<h:outputLabel for="email" value="E-mail:" />
-				<h:inputText id="email" value="#{newCustomer.email}" />
-				<h:message for="email" errorClass="invalid" />
 			</h:panelGrid>
 
 			<p>
@@ -36,7 +32,7 @@
 		<h:dataTable var="c" value="#{customers}"
 			rendered="#{not empty customers}" styleClass="simpletablestyle">
 			<h:column>
-				<f:facet name="header">Id</f:facet>
+				<f:facet name="header">ID</f:facet>
                 #{c.id}
             </h:column>
 			<h:column>
@@ -45,10 +41,6 @@
 					<f:param value="#{c.id}" name="c" />
 				</h:link>
 			</h:column>
-			<h:column>
-				<f:facet name="header">E-mail</f:facet>
-                #{c.email}
-            </h:column>
 		</h:dataTable>
 	</ui:define>
 </ui:composition>

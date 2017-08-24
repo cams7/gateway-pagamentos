@@ -17,7 +17,6 @@ package br.com.cams7.app.controller;
  */
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -52,14 +51,20 @@ public class OrderListProducer {
 	}
 
 	public void onOrderListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Order order) {
-		retrieveAllOrders();
+		Long customerId = order.getCustomer().getId();
+		retrieveAllOrders(customerId);
 	}
 
 	@PostConstruct
 	public void retrieveAllOrders() {
-		Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
-		String param = params.get("c");
-		Long customerId = Long.valueOf(param);
+		String param = facesContext.getExternalContext().getRequestParameterMap().get("c");
+		if (param != null) {
+			Long customerId = Long.valueOf(param);
+			retrieveAllOrders(customerId);
+		}
+	}
+
+	private void retrieveAllOrders(Long customerId) {
 		orders = orderRepository.findAllByCustomer(customerId);
 	}
 }
