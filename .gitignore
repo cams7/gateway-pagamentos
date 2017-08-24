@@ -26,4 +26,5 @@ bin/
 *.war
 *.ear
 
-db/
+*.sqlite
+*.db

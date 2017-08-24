@@ -1,0 +1,1 @@
+select * from pedido where pedido_id= (select min(pedido_id) from pedido where forma_pagamento is null and situacao_pagamento is null);

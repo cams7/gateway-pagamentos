@@ -17,7 +17,6 @@
 package br.com.cams7.app.model;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
@@ -28,45 +27,40 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import br.com.cams7.app.model.entity.Customer;
+import br.com.cams7.app.model.entity.Cliente;
 
 @Stateless
-public class CustomerRepositoryImpl implements CustomerRepository {
-
-	@Inject
-	private Logger log;
+public class ClienteRepositoryImpl implements ClienteRepository {
 
 	@Inject
 	private EntityManager em;
 
 	@Inject
-	private Event<Customer> customerEventSrc;
+	private Event<Cliente> clienteEventSrc;
 
 	@Override
-	public Customer findById(Long id) {
-		return em.find(Customer.class, id);
+	public Cliente buscaPeloId(Long id) {
+		return em.find(Cliente.class, id);
 	}
 
 	@Override
-	public List<Customer> findAll() {
+	public List<Cliente> buscaTodos() {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Customer> cq = cb.createQuery(Customer.class);
+		CriteriaQuery<Cliente> cq = cb.createQuery(Cliente.class);
 
-		Root<Customer> from = cq.from(Customer.class);
+		Root<Cliente> from = cq.from(Cliente.class);
 		cq.select(from);
-		cq.orderBy(cb.asc(from.get("name")));
+		cq.orderBy(cb.asc(from.get("nome")));
 
-		TypedQuery<Customer> tq = em.createQuery(cq);
-		List<Customer> customers = tq.getResultList();
-		return customers;
+		TypedQuery<Cliente> tq = em.createQuery(cq);
+		List<Cliente> clientes = tq.getResultList();
+		return clientes;
 	}
 
 	@Override
-	public void register(Customer customer) {
-		log.info(String.format("Registering %s", customer.getName()));
+	public void cadastra(Cliente cliente) {
+		em.persist(cliente);
 
-		em.persist(customer);
-
-		customerEventSrc.fire(customer);
+		clienteEventSrc.fire(cliente);
 	}
 }

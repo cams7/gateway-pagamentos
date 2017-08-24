@@ -32,16 +32,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import br.com.cams7.app.itau.ItauParametro;
-import br.com.cams7.app.model.OrderRepository;
-import br.com.cams7.app.model.entity.Order;
-import br.com.cams7.app.model.entity.Order.PaymentMethod;
-import br.com.cams7.app.model.entity.Order.PaymentStatus;
+import br.com.cams7.app.model.PedidoRepository;
+import br.com.cams7.app.model.entity.Pedido;
+import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
+import br.com.cams7.app.model.entity.Pedido.SituacaoPagamento;
 
 /**
  * @author cesaram
  *
  */
-public abstract class ProcessPayment {
+public abstract class ProcessaPagamento {
 
 	protected final Logger LOG = Logger.getLogger(getClass().getSimpleName());
 
@@ -50,44 +50,45 @@ public abstract class ProcessPayment {
 	private final int HTTP_OK = 200;
 
 	@EJB
-	private OrderRepository orderRepository;
+	private PedidoRepository pedidoRepository;
 
-	protected void processPayment(Order order) {
+	protected void processaPagamento(Pedido pedido) {
 		try {
-			Document document = getRespostaItau(1, order.getId());
+			Document document = getRespostaItau(1, pedido.getId());
 			List<ItauParametro> parametros = getItauParametros(document);
 
 			if (parametros != null)
 				for (ItauParametro parametro : parametros) {
-					Long orderId = Long.valueOf(parametro.getPedido());
+					Long pedidoId = Long.valueOf(parametro.getPedido());
 
-					if (orderId.equals(order.getId())) {
-						Float valuePaid = Float.valueOf(parametro.getValor());
-						PaymentMethod paymentMethod = PaymentMethod.getPaymentMethod(parametro.getTipPag());
-						PaymentStatus paymentStatus = PaymentStatus.getOrderStatus(parametro.getSitPag());
+					if (pedidoId.equals(pedido.getId())) {
+						Float valorPago = Float.valueOf(parametro.getValor());
+						FormaPagamento formaPagamento = FormaPagamento.getFormaPagamento(parametro.getTipPag());
+						SituacaoPagamento situacaoPagamento = SituacaoPagamento
+								.getSituacaoPagamento(parametro.getSitPag());
 
-						String dayOfMonth = parametro.getDtPag().substring(0, 2);
-						String month = parametro.getDtPag().substring(2, 4);
-						String year = parametro.getDtPag().substring(4);
+						String diaDoMes = parametro.getDtPag().substring(0, 2);
+						String mes = parametro.getDtPag().substring(2, 4);
+						String ano = parametro.getDtPag().substring(4);
 
 						Calendar calendar = Calendar.getInstance();
-						calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(dayOfMonth));
-						calendar.set(Calendar.MONTH, Integer.valueOf(month) - 1);
-						calendar.set(Calendar.YEAR, Integer.valueOf(year));
+						calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(diaDoMes));
+						calendar.set(Calendar.MONTH, Integer.valueOf(mes) - 1);
+						calendar.set(Calendar.YEAR, Integer.valueOf(ano));
 
-						Date payDay = calendar.getTime();
+						Date dataPagamento = calendar.getTime();
 
-						order.setValuePaid(valuePaid);
-						order.setPaymentMethod(paymentMethod);
-						order.setPaymentStatus(paymentStatus);
-						order.setPayDay(payDay);
+						pedido.setValorPago(valorPago);
+						pedido.setFormaPagamento(formaPagamento);
+						pedido.setSituacaoPagamento(situacaoPagamento);
+						pedido.setDataPagamento(dataPagamento);
 
-						getOrderRepository().update(order);
+						getPedidoRepository().atualiza(pedido);
 					}
 
 				}
 
-			LOG.log(Level.INFO, "O pedido {0} foi processado...", new Object[] { SDF.format(order.getOrderDate()) });
+			LOG.log(Level.INFO, "O pedido {0} foi processado...", new Object[] { SDF.format(pedido.getDataPedido()) });
 		} catch (IOException e) {
 			LOG.log(Level.SEVERE, e.getMessage());
 		}
@@ -160,24 +161,24 @@ public abstract class ProcessPayment {
 		HttpResponse response = client.execute(request);
 
 		int statusCode = response.getStatusLine().getStatusCode();
-		if (statusCode != HTTP_OK)
-			return null;
+		if (statusCode == HTTP_OK) {
+			InputStream content = response.getEntity().getContent();
 
-		InputStream content = response.getEntity().getContent();
-
-		try {
-			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(content);
-			return document;
-		} catch (SAXException | ParserConfigurationException e) {
-			LOG.log(Level.SEVERE, e.getMessage());
-		}
+			try {
+				Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(content);
+				return document;
+			} catch (SAXException | ParserConfigurationException e) {
+				LOG.log(Level.SEVERE, e.getMessage());
+			}
+		} else
+			LOG.log(Level.WARNING, "O código de estado HTTP ({0}) é inválido", new Object[] { statusCode });
 
 		return null;
 
 	}
 
-	protected OrderRepository getOrderRepository() {
-		return orderRepository;
+	protected PedidoRepository getPedidoRepository() {
+		return pedidoRepository;
 	}
 
 }

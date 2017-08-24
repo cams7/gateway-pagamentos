@@ -26,31 +26,40 @@ import javax.enterprise.event.Reception;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
-import br.com.cams7.app.model.CustomerRepository;
-import br.com.cams7.app.model.entity.Customer;
+import br.com.cams7.app.model.PedidoRepository;
+import br.com.cams7.app.model.entity.Pedido;
 
 /**
  * @author Madhumita Sadhukhan
  */
 @RequestScoped
-public class CustomerListProducer {
+public class PedidoListProducer extends AppListProducer {
 	@EJB
-	private CustomerRepository customerRepository;
+	private PedidoRepository pedidoRepository;
 
-	private List<Customer> customers;
+	private List<Pedido> pedidos;
 
 	@Produces
 	@Named
-	public List<Customer> getCustomers() {
-		return customers;
+	public List<Pedido> getPedidos() {
+		return pedidos;
 	}
 
-	public void onCustomerListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Customer customer) {
-		retrieveAllCustomers();
+	public void onPedidoListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Pedido pedido) {
+		Long clienteId = pedido.getCliente().getId();
+		carregaTodosPedidos(clienteId);
 	}
 
 	@PostConstruct
-	public void retrieveAllCustomers() {
-		customers = customerRepository.findAll();
+	public void retrieveAllOrders() {
+		String param = getFacesContext().getExternalContext().getRequestParameterMap().get("c");
+		if (param != null) {
+			Long clienteId = Long.valueOf(param);
+			carregaTodosPedidos(clienteId);
+		}
+	}
+
+	private void carregaTodosPedidos(Long clienteId) {
+		pedidos = pedidoRepository.buscaTodosPeloCliente(clienteId);
 	}
 }

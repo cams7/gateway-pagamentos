@@ -32,25 +32,25 @@ import javax.validation.constraints.Size;
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "cliente")
-public class Customer implements Serializable {
+public class Cliente implements Serializable {
 
 	@Id
-	@SequenceGenerator(name = "customerSequence", sequenceName = "cliente_seq", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customerSequence")
+	@SequenceGenerator(name = "clienteSequence", sequenceName = "cliente_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clienteSequence")
 	@Column(name = "cliente_id")
 	private Long id;
 
 	@NotNull
 	@Size(min = 1, max = 25)
-	@Pattern(regexp = "[A-Za-z ]*", message = "must contain only letters and spaces")
+	@Pattern(regexp = "[A-Za-z ]*", message = "deve conter letras e espaços")
 	@Column(name = "cliente_nome")
-	private String name;
+	private String nome;
 
-	public Customer() {
+	public Cliente() {
 		super();
 	}
 
-	public Customer(Long id) {
+	public Cliente(Long id) {
 		this();
 		this.id = id;
 	}
@@ -63,12 +63,12 @@ public class Customer implements Serializable {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getNome() {
+		return nome;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 
 }

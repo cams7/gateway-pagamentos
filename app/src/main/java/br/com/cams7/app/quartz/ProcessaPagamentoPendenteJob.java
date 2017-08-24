@@ -10,8 +10,8 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
 
-import br.com.cams7.app.model.entity.Order;
-import br.com.cams7.app.model.entity.Order.PaymentMethod;
+import br.com.cams7.app.model.entity.Pedido;
+import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
 
 /**
  * @author cesaram
@@ -20,19 +20,19 @@ import br.com.cams7.app.model.entity.Order.PaymentMethod;
  */
 @DisallowConcurrentExecution
 // @ExecuteInJTATransaction
-public class ProcessPendingPaymentJob extends ProcessPayment implements Job {
+public class ProcessaPagamentoPendenteJob extends ProcessaPagamento implements Job {
 
-	public static String PAYMENT_METHOD = "PaymentMethod";
+	public static String FORMA_PAGAMENTO = "FormaPagamento";
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
 			JobDataMap data = context.getJobDetail().getJobDataMap();
-			PaymentMethod paymentMethod = (PaymentMethod) data.get(PAYMENT_METHOD);
+			FormaPagamento formaPagamento = (FormaPagamento) data.get(FORMA_PAGAMENTO);
 
-			Order order = getOrderRepository().findPendingPayment(paymentMethod);
-			if (order != null)
-				processPayment(order);
+			Pedido pedido = getPedidoRepository().buscaPedidoPendente(formaPagamento);
+			if (pedido != null)
+				processaPagamento(pedido);
 
 			LOG.log(Level.INFO, "Trigger: {0}, Fired at: {1}, Instance: {2}",
 					new Object[] { context.getTrigger().getKey(), SDF.format(context.getFireTime()),

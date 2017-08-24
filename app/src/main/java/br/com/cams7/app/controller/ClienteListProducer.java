@@ -24,47 +24,33 @@ import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.Reception;
 import javax.enterprise.inject.Produces;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import br.com.cams7.app.model.OrderRepository;
-import br.com.cams7.app.model.entity.Order;
+import br.com.cams7.app.model.ClienteRepository;
+import br.com.cams7.app.model.entity.Cliente;
 
 /**
  * @author Madhumita Sadhukhan
  */
 @RequestScoped
-public class OrderListProducer {
+public class ClienteListProducer extends AppListProducer {
 	@EJB
-	private OrderRepository orderRepository;
+	private ClienteRepository clienteRepository;
 
-	@Inject
-	private FacesContext facesContext;
-
-	private List<Order> orders;
+	private List<Cliente> clientes;
 
 	@Produces
 	@Named
-	public List<Order> getOrders() {
-		return orders;
+	public List<Cliente> getClientes() {
+		return clientes;
 	}
 
-	public void onOrderListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Order order) {
-		Long customerId = order.getCustomer().getId();
-		retrieveAllOrders(customerId);
+	public void onClienteListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Cliente cliente) {
+		carregaTodosClientes();
 	}
 
 	@PostConstruct
-	public void retrieveAllOrders() {
-		String param = facesContext.getExternalContext().getRequestParameterMap().get("c");
-		if (param != null) {
-			Long customerId = Long.valueOf(param);
-			retrieveAllOrders(customerId);
-		}
-	}
-
-	private void retrieveAllOrders(Long customerId) {
-		orders = orderRepository.findAllByCustomer(customerId);
+	public void carregaTodosClientes() {
+		clientes = clienteRepository.buscaTodos();
 	}
 }

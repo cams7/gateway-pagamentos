@@ -9,7 +9,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
 
-import br.com.cams7.app.model.entity.Order;
+import br.com.cams7.app.model.entity.Pedido;
 
 /**
  * @author cesaram
@@ -18,14 +18,14 @@ import br.com.cams7.app.model.entity.Order;
  */
 @DisallowConcurrentExecution
 // @ExecuteInJTATransaction
-public class ProcessUnverifiedPaymentJob extends ProcessPayment implements Job {
+public class ProcessaPagamentoNaoVerificadoJob extends ProcessaPagamento implements Job {
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
-			Order order = getOrderRepository().findUnverifiedOrder();
-			if (order != null)
-				processPayment(order);
+			Pedido pedido = getPedidoRepository().buscaPedidoNaoVerificado();
+			if (pedido != null)
+				processaPagamento(pedido);
 
 			LOG.log(Level.INFO, "Trigger: {0}, Fired at: {1}, Instance: {2}",
 					new Object[] { context.getTrigger().getKey(), SDF.format(context.getFireTime()),

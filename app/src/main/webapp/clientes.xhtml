@@ -10,15 +10,15 @@
 		<h:form id="reg">
 			<h2>Cadastro de cliente</h2>
 			<h:panelGrid columns="3" columnClasses="titleCell">
-				<h:outputLabel for="name" value="Nome:" />
-				<h:inputText id="name" value="#{newCustomer.name}" />
-				<h:message for="name" errorClass="invalid" />
+				<h:outputLabel for="nome" value="Nome:" />
+				<h:inputText id="nome" value="#{novoCliente.nome}" />
+				<h:message for="nome" errorClass="invalid" />
 			</h:panelGrid>
 
 			<p>
 				<h:panelGrid columns="2">
 					<h:commandButton id="register"
-						action="#{customerController.register}" value="Cadastrar"
+						action="#{clienteController.cadastra}" value="Cadastrar"
 						styleClass="register" />
 					<h:messages styleClass="messages" errorClass="invalid"
 						infoClass="valid" warnClass="warning" globalOnly="true" />
@@ -26,18 +26,19 @@
 			</p>
 		</h:form>
 		<h2>Clientes</h2>
-		<h:panelGroup rendered="#{empty customers}">
+		<h:panelGroup rendered="#{empty clientes}">
 			<em>Cliente não cadastrado.</em>
 		</h:panelGroup>
-		<h:dataTable var="c" value="#{customers}"
-			rendered="#{not empty customers}" styleClass="simpletablestyle">
+		<h:dataTable var="c" value="#{clientes}"
+			rendered="#{not empty clientes}" styleClass="simpletablestyle">
 			<h:column>
 				<f:facet name="header">ID</f:facet>
                 #{c.id}
             </h:column>
 			<h:column>
 				<f:facet name="header">Nome</f:facet>
-				<h:link value="#{c.name}" outcome="orders" includeViewParams="true">
+				<h:link value="#{c.nome}" outcome="pedidos"
+					includeViewParams="true">
 					<f:param value="#{c.id}" name="c" />
 				</h:link>
 			</h:column>
