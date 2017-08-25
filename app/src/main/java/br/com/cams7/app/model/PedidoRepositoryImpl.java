@@ -6,6 +6,7 @@ package br.com.cams7.app.model;
 import static br.com.cams7.app.model.entity.Pedido.SituacaoPagamento.ERRO_PROCESSAMENTO;
 import static br.com.cams7.app.model.entity.Pedido.SituacaoPagamento.NAO_FINALIZADO;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -17,9 +18,12 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
+import br.com.cams7.app.model.entity.Cliente;
 import br.com.cams7.app.model.entity.Pedido;
 import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
+import br.com.cams7.app.model.entity.Pedido.SituacaoPagamento;
 
 /**
  * @author cesaram
@@ -56,8 +60,8 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 
 		Root<Pedido> from = cq.from(Pedido.class);
 		cq.select(from);
-		cq.where(cb.equal(from.get("cliente").get("id"), clienteId));
-		cq.orderBy(cb.desc(from.get("dataPedido")));
+		cq.where(cb.equal(from.<Cliente>get("cliente").<Long>get("id"), clienteId));
+		cq.orderBy(cb.desc(from.<Date>get("dataPedido")));
 
 		TypedQuery<Pedido> tq = em.createQuery(cq);
 		List<Pedido> pedidos = tq.getResultList();
@@ -69,18 +73,23 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Pedido> cq = cb.createQuery(Pedido.class);
 
-		Root<Pedido> from = cq.from(Pedido.class);
-		cq.select(from);
-		cq.where(cb.and(cb.isNull(from.get("formaPagamento")), cb.isNull(from.get("situacaoPagamento"))));
-		cq.groupBy(from.<Number>get("id"));
-		cq.having(cb.equal(from.get("id"), cb.min(from.<Number>get("id"))));
+		Root<Pedido> cqFrom = cq.from(Pedido.class);
+
+		Subquery<Long> sq = cq.subquery(Long.class);
+		Root<Pedido> sqFrom = sq.from(Pedido.class);
+
+		sq.select(cb.min(sqFrom.<Long>get("id")));
+		sq.where(cb.and(cb.isNull(sqFrom.<FormaPagamento>get("formaPagamento")),
+				cb.isNull(sqFrom.<SituacaoPagamento>get("situacaoPagamento"))));
+
+		cq.select(cqFrom);
+		cq.where(cb.equal(cqFrom.<Long>get("id"), sq));
 
 		try {
 			TypedQuery<Pedido> tq = em.createQuery(cq);
 			Pedido pedido = tq.getSingleResult();
 			return pedido;
 		} catch (NoResultException e) {
-
 		}
 
 		return null;
@@ -91,13 +100,18 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Pedido> cq = cb.createQuery(Pedido.class);
 
-		Root<Pedido> from = cq.from(Pedido.class);
-		cq.select(from);
-		cq.where(cb.and(cb.equal(from.get("formaPagamento"), formaPagamento),
-				cb.or(cb.equal(from.get("situacaoPagamento"), NAO_FINALIZADO),
-						cb.equal(from.get("situacaoPagamento"), ERRO_PROCESSAMENTO))));
-		cq.groupBy(from.<Number>get("id"));
-		cq.having(cb.equal(from.get("id"), cb.min(from.<Number>get("id"))));
+		Root<Pedido> cqFrom = cq.from(Pedido.class);
+
+		Subquery<Long> sq = cq.subquery(Long.class);
+		Root<Pedido> sqFrom = sq.from(Pedido.class);
+
+		sq.select(cb.min(sqFrom.<Long>get("id")));
+		sq.where(cb.and(cb.equal(sqFrom.<FormaPagamento>get("formaPagamento"), formaPagamento),
+				cb.or(cb.equal(sqFrom.<SituacaoPagamento>get("situacaoPagamento"), NAO_FINALIZADO),
+						cb.equal(sqFrom.<SituacaoPagamento>get("situacaoPagamento"), ERRO_PROCESSAMENTO))));
+
+		cq.select(cqFrom);
+		cq.where(cb.equal(cqFrom.<Long>get("id"), sq));
 
 		try {
 			TypedQuery<Pedido> tq = em.createQuery(cq);
