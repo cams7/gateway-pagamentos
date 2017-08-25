@@ -11,10 +11,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -25,6 +27,11 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.Trigger.TriggerState;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,6 +55,9 @@ public abstract class ProcessaPagamento {
 	protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
 
 	private final int HTTP_OK = 200;
+
+	@Inject
+	private ParamentosBean pagamentos;
 
 	@EJB
 	private PedidoRepository pedidoRepository;
@@ -177,8 +187,24 @@ public abstract class ProcessaPagamento {
 
 	}
 
+	protected boolean isPaused(Scheduler scheduler, JobKey key) throws SchedulerException {
+		List<? extends Trigger> triggers = scheduler.getTriggersOfJob(key);
+		for (Trigger trigger : triggers) {
+			TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
+
+			if (TriggerState.PAUSED.equals(triggerState))
+				return true;
+		}
+
+		return false;
+	}
+
 	protected PedidoRepository getPedidoRepository() {
 		return pedidoRepository;
+	}
+
+	protected ParamentosBean getPagamentos() {
+		return pagamentos;
 	}
 
 }

@@ -9,6 +9,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
 
+import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -50,62 +51,87 @@ public class EscalonadorBean {
 			final String PAGAMENTO_CARTAO_CREDITO_JOB = "pagamento-cartao-credito-job";
 			final String PAGAMENTO_BOLETO_JOB = "pagamento-boleto-job";
 
+			// Carrega pedidos não verificados
+			JobDetail carregaPedidosNaoVerificadosJob = JobBuilder.newJob(CarregaPedidosNaoVerificadosJob.class)
+					.withIdentity(CarregaPedidosNaoVerificadosJob.CARREGA_PEDIDOS_NAO_VERIFICADOS).build();
+			
+			
+			/**
+			 * Field Name 	Mandatory 	Allowed Values 	 Allowed Special Characters
+			 * Seconds 	    YES 	    0-59 	         , - * /
+			 * Minutes 	    YES 	    0-59 	         , - * /
+			 * Hours 	    YES 	    0-23 	         , - * /
+			 * Day of month YES 	    1-31 	         , - * ? / L W
+			 * Month 	    YES 	    1-12 or JAN-DEC  , - * /
+			 * Day of week 	YES 	    1-7 or SUN-SAT 	 , - * ? / L #
+			 * Year 	    NO 	        empty, 1970-2099 , - * /
+			 */
+
+			//Segundos, Minutos, Horas, Dia do Mês, Mês, Dia da Semana e Ano (Opcional)
+			//Exemplo:
+			//0 0 12 ? * WED A tarefa será executada todas às quartas-feiras às 12:00pm
+			//0 0 8,12 * * * A tarefa será executada todos os dias, às 08:00am e 12:00pm
+			Trigger carregaPedidosNaoVerificadosTrigger = TriggerBuilder.newTrigger()
+					.withIdentity(getTriggerName(CarregaPedidosNaoVerificadosJob.CARREGA_PEDIDOS_NAO_VERIFICADOS))
+					.startNow().withSchedule(CronScheduleBuilder.cronSchedule("0/30 * * * * ?")).build();
+
 			// Processa pagamento não verificado
 			JobDetail pagamentoNaoVerificadoJob = JobBuilder.newJob(ProcessaPagamentoNaoVerificadoJob.class)
-					.withIdentity(JobKey.jobKey("job1", PAGAMENTO_NAO_VERIFICADO_JOB)).build();
+					.withIdentity(ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO).build();
 
 			Trigger pagamentoNaoVerificadoTrigger = TriggerBuilder.newTrigger()
-					.withIdentity(
-							TriggerKey.triggerKey("pagamento-nao-verificado-trigger", PAGAMENTO_NAO_VERIFICADO_JOB))
-					.startNow().withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(10)).build();
+					.withIdentity(getTriggerName(ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO)).startNow()
+					.withSchedule(CronScheduleBuilder.cronSchedule("0/5 * * * * ?")).build();
 
-			// Processa pagamento não escolhido
-			JobDetail pagamentoNaoEscolhidoJob = JobBuilder.newJob(ProcessaPagamentoPendenteJob.class)
-					.withIdentity(JobKey.jobKey("job2", PAGAMENTO_NAO_ESCOLHIDO_JOB)).build();
-			pagamentoNaoEscolhidoJob.getJobDataMap().put(ProcessaPagamentoPendenteJob.FORMA_PAGAMENTO,
-					FormaPagamento.NAO_ESCOLHIDO);
-
-			Trigger pagamentoNaoEscolhidoTrigger = TriggerBuilder.newTrigger()
-					.withIdentity(TriggerKey.triggerKey("pagamento-nao-escolhido-trigger", PAGAMENTO_NAO_ESCOLHIDO_JOB))
-					.startNow().withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(10)).build();
-
-			// Processa pagamento à vista
-			JobDetail pagamentoAVistaJob = JobBuilder.newJob(ProcessaPagamentoPendenteJob.class)
-					.withIdentity(JobKey.jobKey("job3", PAGAMENTO_A_VISTA_JOB)).build();
-			pagamentoAVistaJob.getJobDataMap().put(ProcessaPagamentoPendenteJob.FORMA_PAGAMENTO,
-					FormaPagamento.A_VISTA);
-
-			Trigger pagamentoAVistaTrigger = TriggerBuilder.newTrigger()
-					.withIdentity(TriggerKey.triggerKey("pagamento-a-vista-trigger", PAGAMENTO_A_VISTA_JOB)).startNow()
-					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(30)).build();
-
-			// Processa pagamento no cartão de credito
-			JobDetail pagamentoCartaoCreditoJob = JobBuilder.newJob(ProcessaPagamentoPendenteJob.class)
-					.withIdentity(JobKey.jobKey("job3", PAGAMENTO_CARTAO_CREDITO_JOB)).build();
-			pagamentoCartaoCreditoJob.getJobDataMap().put(ProcessaPagamentoPendenteJob.FORMA_PAGAMENTO,
-					FormaPagamento.CARTAO_CREDITO);
-
-			Trigger pagamentoCartaoCreditoTrigger = TriggerBuilder.newTrigger()
-					.withIdentity(
-							TriggerKey.triggerKey("pagamento-cartao-credito-trigger", PAGAMENTO_CARTAO_CREDITO_JOB))
-					.startNow().withSchedule(SimpleScheduleBuilder.repeatMinutelyForever()).build();
-
-			// Processa pagamento no boleto bancário
-			JobDetail pagamentoBoletoJob = JobBuilder.newJob(ProcessaPagamentoPendenteJob.class)
-					.withIdentity(JobKey.jobKey("job4", PAGAMENTO_BOLETO_JOB)).build();
-			pagamentoBoletoJob.getJobDataMap().put(ProcessaPagamentoPendenteJob.FORMA_PAGAMENTO, FormaPagamento.BOLETO);
-
-			Trigger pagamentoBoletoTrigger = TriggerBuilder.newTrigger()
-					.withIdentity(TriggerKey.triggerKey("pagamento-boleto-trigger", PAGAMENTO_BOLETO_JOB)).startNow()
-					.withSchedule(SimpleScheduleBuilder.repeatHourlyForever()).build();
+//			// Processa pagamento não escolhido
+//			JobDetail pagamentoNaoEscolhidoJob = JobBuilder.newJob(ProcessaPagamentoPendenteJob.class)
+//					.withIdentity(JobKey.jobKey("job3", PAGAMENTO_NAO_ESCOLHIDO_JOB)).build();
+//			pagamentoNaoEscolhidoJob.getJobDataMap().put(ProcessaPagamentoPendenteJob.FORMA_PAGAMENTO,
+//					FormaPagamento.NAO_ESCOLHIDO);
+//
+//			Trigger pagamentoNaoEscolhidoTrigger = TriggerBuilder.newTrigger()
+//					.withIdentity(TriggerKey.triggerKey("pagamento-nao-escolhido-trigger", PAGAMENTO_NAO_ESCOLHIDO_JOB))
+//					.startNow().withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(10)).build();
+//
+//			// Processa pagamento à vista
+//			JobDetail pagamentoAVistaJob = JobBuilder.newJob(ProcessaPagamentoPendenteJob.class)
+//					.withIdentity(JobKey.jobKey("job4", PAGAMENTO_A_VISTA_JOB)).build();
+//			pagamentoAVistaJob.getJobDataMap().put(ProcessaPagamentoPendenteJob.FORMA_PAGAMENTO,
+//					FormaPagamento.A_VISTA);
+//
+//			Trigger pagamentoAVistaTrigger = TriggerBuilder.newTrigger()
+//					.withIdentity(TriggerKey.triggerKey("pagamento-a-vista-trigger", PAGAMENTO_A_VISTA_JOB)).startNow()
+//					.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(30)).build();
+//
+//			// Processa pagamento no cartão de credito
+//			JobDetail pagamentoCartaoCreditoJob = JobBuilder.newJob(ProcessaPagamentoPendenteJob.class)
+//					.withIdentity(JobKey.jobKey("job5", PAGAMENTO_CARTAO_CREDITO_JOB)).build();
+//			pagamentoCartaoCreditoJob.getJobDataMap().put(ProcessaPagamentoPendenteJob.FORMA_PAGAMENTO,
+//					FormaPagamento.CARTAO_CREDITO);
+//
+//			Trigger pagamentoCartaoCreditoTrigger = TriggerBuilder.newTrigger()
+//					.withIdentity(
+//							TriggerKey.triggerKey("pagamento-cartao-credito-trigger", PAGAMENTO_CARTAO_CREDITO_JOB))
+//					.startNow().withSchedule(SimpleScheduleBuilder.repeatMinutelyForever()).build();
+//
+//			// Processa pagamento no boleto bancário
+//			JobDetail pagamentoBoletoJob = JobBuilder.newJob(ProcessaPagamentoPendenteJob.class)
+//					.withIdentity(JobKey.jobKey("job6", PAGAMENTO_BOLETO_JOB)).build();
+//			pagamentoBoletoJob.getJobDataMap().put(ProcessaPagamentoPendenteJob.FORMA_PAGAMENTO, FormaPagamento.BOLETO);
+//
+//			Trigger pagamentoBoletoTrigger = TriggerBuilder.newTrigger()
+//					.withIdentity(TriggerKey.triggerKey("pagamento-boleto-trigger", PAGAMENTO_BOLETO_JOB)).startNow()
+//					.withSchedule(SimpleScheduleBuilder.repeatHourlyForever()).build();
 
 			scheduler.start(); // starting a scheduler before scheduling jobs helped in getting rid of deadlock
 								// on startup
+			scheduler.scheduleJob(carregaPedidosNaoVerificadosJob, newHashSet(carregaPedidosNaoVerificadosTrigger),
+					true);
 			scheduler.scheduleJob(pagamentoNaoVerificadoJob, newHashSet(pagamentoNaoVerificadoTrigger), true);
-			scheduler.scheduleJob(pagamentoNaoEscolhidoJob, newHashSet(pagamentoNaoEscolhidoTrigger), true);
-			scheduler.scheduleJob(pagamentoAVistaJob, newHashSet(pagamentoAVistaTrigger), true);
-			scheduler.scheduleJob(pagamentoCartaoCreditoJob, newHashSet(pagamentoCartaoCreditoTrigger), true);
-			scheduler.scheduleJob(pagamentoBoletoJob, newHashSet(pagamentoBoletoTrigger), true);
+//			scheduler.scheduleJob(pagamentoNaoEscolhidoJob, newHashSet(pagamentoNaoEscolhidoTrigger), true);
+//			scheduler.scheduleJob(pagamentoAVistaJob, newHashSet(pagamentoAVistaTrigger), true);
+//			scheduler.scheduleJob(pagamentoCartaoCreditoJob, newHashSet(pagamentoCartaoCreditoTrigger), true);
+//			scheduler.scheduleJob(pagamentoBoletoJob, newHashSet(pagamentoBoletoTrigger), true);
 
 			printJobsAndTriggers(scheduler);
 		} catch (SchedulerException e) {
@@ -133,6 +159,10 @@ public class EscalonadorBean {
 				LOG.info("Found trigger identified by {}", triggerKey);
 			}
 		}
+	}
+
+	private String getTriggerName(JobKey key) {
+		return key.getName().replaceFirst("-job", "-trigger");
 	}
 
 	@PreDestroy

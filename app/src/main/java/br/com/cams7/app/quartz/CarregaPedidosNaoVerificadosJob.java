@@ -12,8 +12,6 @@ import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
-import br.com.cams7.app.model.entity.Pedido;
-
 /**
  * @author cesaram
  *
@@ -21,27 +19,32 @@ import br.com.cams7.app.model.entity.Pedido;
  */
 @DisallowConcurrentExecution
 // @ExecuteInJTATransaction
-public class ProcessaPagamentoNaoVerificadoJob extends ProcessaPagamento implements Job {
+public class CarregaPedidosNaoVerificadosJob extends ProcessaPagamento implements Job {
 
-	public static String JOB_GROUP = "pagamento-nao-verificado";
-	public static JobKey PAGAMENTO_NAO_VERIFICADO = JobKey.jobKey(JOB_GROUP + "-job", JOB_GROUP);
-
-	public static String PAGAMENTOS_NAO_VERIFICADOS = "PagamentosPendentes";
+	private static String JOB_NAME = "carrega-pedidos-nao-verificados";
+	public static JobKey CARREGA_PEDIDOS_NAO_VERIFICADOS = JobKey.jobKey(JOB_NAME + "-job",
+			ProcessaPagamentoNaoVerificadoJob.JOB_GROUP);
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
 			Scheduler scheduler = context.getScheduler();
 
-			if (scheduler.checkExists(CarregaPedidosNaoVerificadosJob.CARREGA_PEDIDOS_NAO_VERIFICADOS)) {
+			if (scheduler.checkExists(ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO)) {
+				boolean paused = isPaused(scheduler, ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO);
 
-				List<Long> pedidos = getPagamentos().get(PAGAMENTOS_NAO_VERIFICADOS);
-				System.out.println("Processa: " + pedidos);
+				List<Long> pedidos = getPedidoRepository().buscaIdsPedidosNaoVerificados();
+				System.out.println("Carrega: " + pedidos);
 
-				if (pedidos != null && !pedidos.isEmpty()) {
-					Long pedidoId = pedidos.remove(0);
-					Pedido pedido = getPedidoRepository().buscaPeloId(pedidoId);
-					processaPagamento(pedido);
+				if (pedidos.isEmpty()) {
+					if (!paused)
+						scheduler.pauseJob(ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO);
+				} else {
+					if (paused)
+						scheduler.resumeJob(ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO);
+
+					getPagamentos().add(ProcessaPagamentoNaoVerificadoJob.PAGAMENTOS_NAO_VERIFICADOS, pedidos);
+
 				}
 			}
 

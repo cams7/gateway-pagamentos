@@ -18,12 +18,14 @@
 
 		<version.jboss.bom>8.0.0.Final</version.jboss.bom>
 
-		<!--app.quartz.datasource.connection.url>jdbc:mysql://localhost:3306/quartz_jee_demo</app.quartz.datasource.connection.url> 
-			<app.quartz.datasource.driver>mysql</app.quartz.datasource.driver> <app.quartz.datasource.username>quartz</app.quartz.datasource.username> 
-			<app.quartz.datasource.password>demo</app.quartz.datasource.password> <app.quartz.dataSource>JtaMySqlDS</app.quartz.dataSource> 
-			<app.quartz.nonManagedTXDataSource>MySqlDS</app.quartz.nonManagedTXDataSource> 
-			<app.quartz.dataSource.jndiURL>java:jboss/datasources/${app.quartz.dataSource}</app.quartz.dataSource.jndiURL> 
-			<app.quartz.nonManagedTXDataSource.jndiURL>java:jboss/datasources/${app.quartz.nonManagedTXDataSource}</app.quartz.nonManagedTXDataSource.jndiURL -->
+		<app.quartz.datasource.connection.url>jdbc:mysql://localhost:3306/quartz_jee_demo</app.quartz.datasource.connection.url> 
+		<app.quartz.datasource.driver>mysql</app.quartz.datasource.driver> 
+		<app.quartz.datasource.username>quartz</app.quartz.datasource.username> 
+		<app.quartz.datasource.password>demo</app.quartz.datasource.password> 
+		<app.quartz.dataSource>JtaGatewayPagamentosDS</app.quartz.dataSource> 
+		<app.quartz.nonManagedTXDataSource>GatewayPagamentosDS</app.quartz.nonManagedTXDataSource> 
+		<app.quartz.dataSource.jndiURL>java:jboss/datasources/${app.quartz.dataSource}</app.quartz.dataSource.jndiURL> 
+		<app.quartz.nonManagedTXDataSource.jndiURL>java:jboss/datasources/${app.quartz.nonManagedTXDataSource}</app.quartz.nonManagedTXDataSource.jndiURL>
 
 		<app.database>app</app.database>
 

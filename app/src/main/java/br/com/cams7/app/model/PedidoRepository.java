@@ -24,4 +24,6 @@ public interface PedidoRepository {
 	void cadastra(Pedido pedido);
 
 	void atualiza(Pedido pedido);
+
+	List<Long> buscaIdsPedidosNaoVerificados();
 }

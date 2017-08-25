@@ -124,6 +124,24 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 		return null;
 	}
 
+	@Override
+	public List<Long> buscaIdsPedidosNaoVerificados() {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+
+		Root<Pedido> from = cq.from(Pedido.class);
+
+		cq.select(from.<Long>get("id")).distinct(true);
+		cq.where(cb.and(cb.isNull(from.<FormaPagamento>get("formaPagamento")),
+				cb.isNull(from.<SituacaoPagamento>get("situacaoPagamento"))));
+		cq.orderBy(cb.asc(from.<Long>get("id")));
+
+		TypedQuery<Long> tq = em.createQuery(cq);
+		List<Long> ids = tq.getResultList();
+
+		return ids;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

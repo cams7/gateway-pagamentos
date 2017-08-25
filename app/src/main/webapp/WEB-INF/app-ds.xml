@@ -2,7 +2,7 @@
 <datasources xmlns="http://www.jboss.org/ironjacamar/schema"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.jboss.org/ironjacamar/schema http://docs.jboss.org/ironjacamar/schema/datasources_1_0.xsd">
-	<!--datasource jta="true" jndi-name="${app.quartz.dataSource.jndiURL}"
+	<datasource jta="true" jndi-name="${app.quartz.dataSource.jndiURL}"
 		pool-name="${app.quartz.dataSource}" enabled="true" use-java-context="true">
 		<connection-url>${app.quartz.datasource.connection.url}</connection-url>
 		<driver>${app.quartz.datasource.driver}</driver>
@@ -21,7 +21,7 @@
 			<user-name>${app.quartz.datasource.username}</user-name>
 			<password>${app.quartz.datasource.password}</password>
 		</security>
-	</datasource-->
+	</datasource>
 	<!--datasource jndi-name="java:jboss/datasources/H2DS"
 		pool-name="H2DS" enabled="true" use-java-context="true">
 		<connection-url>${app.datasource.h2.connection.url}</connection-url>
