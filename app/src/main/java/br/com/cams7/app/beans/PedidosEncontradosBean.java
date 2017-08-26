@@ -1,7 +1,7 @@
 /**
  * 
  */
-package br.com.cams7.app.quartz;
+package br.com.cams7.app.beans;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,18 +16,18 @@ import javax.enterprise.context.ApplicationScoped;
  */
 @ApplicationScoped
 public class PedidosEncontradosBean {
-	private Map<String, List<Long>> parameters;
+	private Map<String, List<Long>> pedidos;
 
 	@PostConstruct
 	private void init() {
-		parameters = new HashMap<>();
+		pedidos = new HashMap<>();
 	}
 
-	public void adiciona(String key, List<Long> ids) {
-		parameters.put(key, ids);
+	public void adiciona(String tipo, List<Long> pedidos) {
+		this.pedidos.put(tipo, pedidos);
 	}
 
-	public List<Long> getPedidos(String key) {
-		return parameters.get(key);
+	public List<Long> getPedidos(String tipo) {
+		return pedidos.get(tipo);
 	}
 }

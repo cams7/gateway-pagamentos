@@ -1,4 +1,4 @@
-package br.com.cams7.app.quartz;
+package br.com.cams7.app.schedule;
 
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;

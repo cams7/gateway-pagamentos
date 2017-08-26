@@ -69,7 +69,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 	}
 
 	@Override
-	public Pedido buscaPedidoNaoVerificado() {
+	public Pedido buscaPrimeiroPedidoNaoVerificado() {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Pedido> cq = cb.createQuery(Pedido.class);
 
@@ -96,7 +96,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 	}
 
 	@Override
-	public Pedido buscaPedidoPendente(FormaPagamento formaPagamento) {
+	public Pedido buscaPrimeiroPedidoPendente(FormaPagamento formaPagamento) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Pedido> cq = cb.createQuery(Pedido.class);
 
@@ -132,8 +132,31 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 		Root<Pedido> from = cq.from(Pedido.class);
 
 		cq.select(from.<Long>get("id")).distinct(true);
+
 		cq.where(cb.and(cb.isNull(from.<FormaPagamento>get("formaPagamento")),
 				cb.isNull(from.<SituacaoPagamento>get("situacaoPagamento"))));
+
+		cq.orderBy(cb.asc(from.<Long>get("id")));
+
+		TypedQuery<Long> tq = em.createQuery(cq);
+		List<Long> ids = tq.getResultList();
+
+		return ids;
+	}
+
+	@Override
+	public List<Long> buscaPedidosPendentesPelaFormaPagamento(FormaPagamento formaPagamento) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+
+		Root<Pedido> from = cq.from(Pedido.class);
+
+		cq.select(from.<Long>get("id")).distinct(true);
+
+		cq.where(cb.and(cb.equal(from.<FormaPagamento>get("formaPagamento"), formaPagamento),
+				cb.or(cb.equal(from.<SituacaoPagamento>get("situacaoPagamento"), NAO_FINALIZADO),
+						cb.equal(from.<SituacaoPagamento>get("situacaoPagamento"), ERRO_PROCESSAMENTO))));
+
 		cq.orderBy(cb.asc(from.<Long>get("id")));
 
 		TypedQuery<Long> tq = em.createQuery(cq);

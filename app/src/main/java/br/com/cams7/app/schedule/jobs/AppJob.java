@@ -1,7 +1,7 @@
 /**
  * 
  */
-package br.com.cams7.app.quartz;
+package br.com.cams7.app.schedule.jobs;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +38,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import br.com.cams7.app.beans.PedidosEncontradosBean;
 import br.com.cams7.app.itau.ItauParametro;
 import br.com.cams7.app.model.PedidoRepository;
 import br.com.cams7.app.model.entity.Pedido;
@@ -208,8 +209,16 @@ public abstract class AppJob {
 						new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(context.getFireTime()),
 						context.getScheduler().getSchedulerInstanceId() });
 	}
+	
+	protected static String getCarregaName(String name) {
+		return getJobName("carrega-" + name);
+	}
+	
+	protected static String getProcessaName(String name) {
+		return getJobName("processa-" + name);
+	}
 
-	protected static String getJobName(String name) {
+	private static String getJobName(String name) {
 		return name + "-job";
 	}
 

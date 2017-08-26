@@ -17,13 +17,15 @@ public interface PedidoRepository {
 
 	List<Pedido> buscaTodosPeloCliente(Long customerId);
 
-	Pedido buscaPedidoNaoVerificado();
+	Pedido buscaPrimeiroPedidoNaoVerificado();
 
-	Pedido buscaPedidoPendente(FormaPagamento formaPagamento);
+	Pedido buscaPrimeiroPedidoPendente(FormaPagamento formaPagamento);
 
 	void cadastra(Pedido pedido);
 
 	void atualiza(Pedido pedido);
 
 	List<Long> buscaPedidosNaoVerificados();
+
+	List<Long> buscaPedidosPendentesPelaFormaPagamento(FormaPagamento formaPagamento);
 }
