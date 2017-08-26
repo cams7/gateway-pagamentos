@@ -1,7 +1,7 @@
 /**
  * 
  */
-package br.com.cams7.app.model.converter;
+package br.com.cams7.app.converter;
 
 import javax.faces.convert.EnumConverter;
 import javax.faces.convert.FacesConverter;

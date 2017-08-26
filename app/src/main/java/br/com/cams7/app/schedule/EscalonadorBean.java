@@ -69,7 +69,6 @@ public class EscalonadorBean {
 
 	@PostConstruct
 	public void scheduleJobs() {
-
 		try {
 			scheduler = new StdSchedulerFactory().getScheduler();
 			scheduler.setJobFactory(jobFactory);
@@ -105,6 +104,7 @@ public class EscalonadorBean {
 	 */
 	private void pedidosNaoVerificados() throws SchedulerException {
 		Tarefa tarefa = tarefaRepository.buscaPeloId(PEDIDOS_NAO_VERIFICADOS);
+		
 		// Carrega os pedidos não verificados
 		JobDetail carregaPedidosNaoVerificadosJob = JobBuilder.newJob(CarregaPedidosNaoVerificadosJob.class)
 				.withIdentity(CARREGA_PEDIDOS_NAO_VERIFICADOS).build();
@@ -133,6 +133,7 @@ public class EscalonadorBean {
 	 */
 	private void pagamentosNaoEscolhidos() throws SchedulerException {
 		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_NAO_ESCOLHIDOS);
+		
 		// Carrega os pagamentos não escolhidos
 		JobDetail carregaPagamentosNaoEscolhidosJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
 				.withIdentity(CARREGA_PAGAMENTOS_NAO_ESCOLHIDOS).build();
@@ -165,6 +166,7 @@ public class EscalonadorBean {
 	 */
 	private void pagamentosAVista() throws SchedulerException {
 		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_A_VISTA);
+		
 		// Carrega os pagamentos à vista
 		JobDetail carregaPagamentosAVistaJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
 				.withIdentity(CARREGA_PAGAMENTOS_A_VISTA).build();
@@ -195,6 +197,7 @@ public class EscalonadorBean {
 	 */
 	private void pagamentosCartoesCredito() throws SchedulerException {
 		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_CARTOES_CREDITO);
+		
 		// Carrega os pagamentos realizados por cartões de crédito
 		JobDetail carregaPagamentosCartoesCreditoJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
 				.withIdentity(CARREGA_PAGAMENTOS_CARTOES_CREDITO).build();
@@ -227,6 +230,7 @@ public class EscalonadorBean {
 	 */
 	private void pagamentosBoletos() throws SchedulerException {
 		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_BOLETOS);
+		
 		// Carrega os pagamentos realizados por boletos bancário
 		JobDetail carregaPagamentosBoletosJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
 				.withIdentity(CARREGA_PAGAMENTOS_BOLETOS).build();
