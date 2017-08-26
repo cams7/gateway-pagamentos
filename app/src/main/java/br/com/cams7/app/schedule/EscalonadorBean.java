@@ -4,6 +4,11 @@ import static br.com.cams7.app.model.entity.Pedido.FormaPagamento.A_VISTA;
 import static br.com.cams7.app.model.entity.Pedido.FormaPagamento.BOLETO;
 import static br.com.cams7.app.model.entity.Pedido.FormaPagamento.CARTAO_CREDITO;
 import static br.com.cams7.app.model.entity.Pedido.FormaPagamento.NAO_ESCOLHIDO;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_A_VISTA;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_BOLETOS;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_CARTOES_CREDITO;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_NAO_ESCOLHIDOS;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PEDIDOS_NAO_VERIFICADOS;
 import static br.com.cams7.app.schedule.jobs.CarregaPedidosNaoVerificadosJob.CARREGA_PEDIDOS_NAO_VERIFICADOS;
 import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_PAGAMENTOS_A_VISTA;
 import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_PAGAMENTOS_BOLETOS;
@@ -21,6 +26,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
@@ -40,6 +46,8 @@ import org.quartz.spi.JobFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import br.com.cams7.app.model.TarefaRepository;
+import br.com.cams7.app.model.entity.Tarefa;
 import br.com.cams7.app.schedule.jobs.CarregaPedidosNaoVerificadosJob;
 import br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob;
 import br.com.cams7.app.schedule.jobs.ProcessaPedidosNaoVerificadosJob;
@@ -55,6 +63,9 @@ public class EscalonadorBean {
 
 	@Inject
 	private JobFactory jobFactory;
+
+	@EJB
+	private TarefaRepository tarefaRepository;
 
 	@PostConstruct
 	public void scheduleJobs() {
@@ -93,13 +104,14 @@ public class EscalonadorBean {
 	 * @throws SchedulerException
 	 */
 	private void pedidosNaoVerificados() throws SchedulerException {
+		Tarefa tarefa = tarefaRepository.buscaPeloId(PEDIDOS_NAO_VERIFICADOS);
 		// Carrega os pedidos não verificados
 		JobDetail carregaPedidosNaoVerificadosJob = JobBuilder.newJob(CarregaPedidosNaoVerificadosJob.class)
 				.withIdentity(CARREGA_PEDIDOS_NAO_VERIFICADOS).build();
 
 		Trigger carregaPedidosNaoVerificadosTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(CARREGA_PEDIDOS_NAO_VERIFICADOS))
-				.withSchedule(CronScheduleBuilder.cronSchedule("0/30 * * * * ?")).build();
+				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getCarregaCron())).build();
 
 		// Processa os pedidos não verificados
 		JobDetail processaPedidosNaoVerificadosJob = JobBuilder.newJob(ProcessaPedidosNaoVerificadosJob.class)
@@ -107,7 +119,7 @@ public class EscalonadorBean {
 
 		Trigger processaPedidosNaoVerificadosTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(PROCESSA_PEDIDOS_NAO_VERIFICADOS))
-				.withSchedule(CronScheduleBuilder.cronSchedule("0/11 * * * * ?")).build();
+				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getProcessaCron())).build();
 
 		scheduler.scheduleJob(carregaPedidosNaoVerificadosJob, newHashSet(carregaPedidosNaoVerificadosTrigger), true);
 		scheduler.scheduleJob(processaPedidosNaoVerificadosJob, newHashSet(processaPedidosNaoVerificadosTrigger), true);
@@ -120,6 +132,7 @@ public class EscalonadorBean {
 	 * @throws SchedulerException
 	 */
 	private void pagamentosNaoEscolhidos() throws SchedulerException {
+		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_NAO_ESCOLHIDOS);
 		// Carrega os pagamentos não escolhidos
 		JobDetail carregaPagamentosNaoEscolhidosJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
 				.withIdentity(CARREGA_PAGAMENTOS_NAO_ESCOLHIDOS).build();
@@ -127,7 +140,7 @@ public class EscalonadorBean {
 
 		Trigger carregaPagamentosNaoEscolhidosTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(CARREGA_PAGAMENTOS_NAO_ESCOLHIDOS))
-				.withSchedule(CronScheduleBuilder.cronSchedule("12 0/1 * * * ?")).build();
+				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getCarregaCron())).build();
 
 		// Processa os pagamentos não escolhidos
 		JobDetail processaPagamentosNaoEscolhidosJob = JobBuilder.newJob(ProcessaPedidosPendentesJob.class)
@@ -136,7 +149,7 @@ public class EscalonadorBean {
 
 		Trigger processaPagamentosNaoEscolhidosTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(PROCESSA_PAGAMENTOS_NAO_ESCOLHIDOS))
-				.withSchedule(CronScheduleBuilder.cronSchedule("0/13 * * * * ?")).build();
+				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getProcessaCron())).build();
 
 		scheduler.scheduleJob(carregaPagamentosNaoEscolhidosJob, newHashSet(carregaPagamentosNaoEscolhidosTrigger),
 				true);
@@ -151,6 +164,7 @@ public class EscalonadorBean {
 	 * @throws SchedulerException
 	 */
 	private void pagamentosAVista() throws SchedulerException {
+		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_A_VISTA);
 		// Carrega os pagamentos à vista
 		JobDetail carregaPagamentosAVistaJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
 				.withIdentity(CARREGA_PAGAMENTOS_A_VISTA).build();
@@ -158,7 +172,7 @@ public class EscalonadorBean {
 
 		Trigger carregaPagamentosAVistaTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(CARREGA_PAGAMENTOS_A_VISTA))
-				.withSchedule(CronScheduleBuilder.cronSchedule("24 0/2 * * * ?")).build();
+				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getCarregaCron())).build();
 
 		// Processa os pagamentos à vista
 		JobDetail processaPagamentosAVistaJob = JobBuilder.newJob(ProcessaPedidosPendentesJob.class)
@@ -167,7 +181,7 @@ public class EscalonadorBean {
 
 		Trigger processaPagamentosAVistaTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(PROCESSA_PAGAMENTOS_A_VISTA))
-				.withSchedule(CronScheduleBuilder.cronSchedule("0/25 * * * * ?")).build();
+				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getProcessaCron())).build();
 
 		scheduler.scheduleJob(carregaPagamentosAVistaJob, newHashSet(carregaPagamentosAVistaTrigger), true);
 		scheduler.scheduleJob(processaPagamentosAVistaJob, newHashSet(processaPagamentosAVistaTrigger), true);
@@ -180,6 +194,7 @@ public class EscalonadorBean {
 	 * @throws SchedulerException
 	 */
 	private void pagamentosCartoesCredito() throws SchedulerException {
+		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_CARTOES_CREDITO);
 		// Carrega os pagamentos realizados por cartões de crédito
 		JobDetail carregaPagamentosCartoesCreditoJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
 				.withIdentity(CARREGA_PAGAMENTOS_CARTOES_CREDITO).build();
@@ -187,7 +202,7 @@ public class EscalonadorBean {
 
 		Trigger carregaPagamentosCartoesCreditoTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(CARREGA_PAGAMENTOS_CARTOES_CREDITO))
-				.withSchedule(CronScheduleBuilder.cronSchedule("36 0/3 * * * ?")).build();
+				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getCarregaCron())).build();
 
 		// Processa os pagamentos realizados por cartões de crédito
 		JobDetail processaPagamentosCartoesCreditoJob = JobBuilder.newJob(ProcessaPedidosPendentesJob.class)
@@ -196,7 +211,7 @@ public class EscalonadorBean {
 
 		Trigger processaPagamentosCartoesCreditoTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(PROCESSA_PAGAMENTOS_CARTOES_CREDITO))
-				.withSchedule(CronScheduleBuilder.cronSchedule("0/37 * * * * ?")).build();
+				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getProcessaCron())).build();
 
 		scheduler.scheduleJob(carregaPagamentosCartoesCreditoJob, newHashSet(carregaPagamentosCartoesCreditoTrigger),
 				true);
@@ -211,6 +226,7 @@ public class EscalonadorBean {
 	 * @throws SchedulerException
 	 */
 	private void pagamentosBoletos() throws SchedulerException {
+		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_BOLETOS);
 		// Carrega os pagamentos realizados por boletos bancário
 		JobDetail carregaPagamentosBoletosJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
 				.withIdentity(CARREGA_PAGAMENTOS_BOLETOS).build();
@@ -218,7 +234,7 @@ public class EscalonadorBean {
 
 		Trigger carregaPagamentosBoletosTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(CARREGA_PAGAMENTOS_BOLETOS))
-				.withSchedule(CronScheduleBuilder.cronSchedule("48 0/4 * * * ?")).build();
+				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getCarregaCron())).build();
 
 		// Processa os pagamentos realizados por boletos bancário
 		JobDetail processaPagamentosBoletosJob = JobBuilder.newJob(ProcessaPedidosPendentesJob.class)
@@ -227,7 +243,7 @@ public class EscalonadorBean {
 
 		Trigger processaPagamentosBoletosTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(PROCESSA_PAGAMENTOS_BOLETOS))
-				.withSchedule(CronScheduleBuilder.cronSchedule("0/49 * * * * ?")).build();
+				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getProcessaCron())).build();
 
 		scheduler.scheduleJob(carregaPagamentosBoletosJob, newHashSet(carregaPagamentosBoletosTrigger), true);
 		scheduler.scheduleJob(processaPagamentosBoletosJob, newHashSet(processaPagamentosBoletosTrigger), true);

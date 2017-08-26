@@ -1,5 +1,7 @@
 package br.com.cams7.app.schedule.jobs;
 
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PEDIDOS_NAO_VERIFICADOS;
+
 import java.util.List;
 import java.util.logging.Level;
 
@@ -23,9 +25,7 @@ import br.com.cams7.app.model.entity.Pedido;
 // @ExecuteInJTATransaction
 public class ProcessaPedidosNaoVerificadosJob extends AppJob implements Job {
 
-	public static String JOB_GROUP = "pedidos-nao-verificados";
-
-	public static String PEDIDOS_NAO_VERIFICADOS = JOB_GROUP;
+	public static String JOB_GROUP = PEDIDOS_NAO_VERIFICADOS.getCodigo();
 
 	public static JobKey PROCESSA_PEDIDOS_NAO_VERIFICADOS = JobKey.jobKey(getProcessaName(PEDIDOS_NAO_VERIFICADOS),
 			JOB_GROUP);

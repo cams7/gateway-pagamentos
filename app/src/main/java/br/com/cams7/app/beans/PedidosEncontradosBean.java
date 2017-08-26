@@ -10,24 +10,26 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
+import br.com.cams7.app.model.entity.Tarefa.TarefaId;
+
 /**
  * @author cesaram
  *
  */
 @ApplicationScoped
 public class PedidosEncontradosBean {
-	private Map<String, List<Long>> pedidos;
+	private Map<TarefaId, List<Long>> pedidos;
 
 	@PostConstruct
 	private void init() {
 		pedidos = new HashMap<>();
 	}
 
-	public void adiciona(String tipo, List<Long> pedidos) {
-		this.pedidos.put(tipo, pedidos);
+	public void adiciona(TarefaId rotina, List<Long> pedidos) {
+		this.pedidos.put(rotina, pedidos);
 	}
 
-	public List<Long> getPedidos(String tipo) {
-		return pedidos.get(tipo);
+	public List<Long> getPedidos(TarefaId rotina) {
+		return pedidos.get(rotina);
 	}
 }

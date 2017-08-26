@@ -44,6 +44,7 @@ import br.com.cams7.app.model.PedidoRepository;
 import br.com.cams7.app.model.entity.Pedido;
 import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
 import br.com.cams7.app.model.entity.Pedido.SituacaoPagamento;
+import br.com.cams7.app.model.entity.Tarefa.TarefaId;
 import br.com.cams7.app.util.AppException;
 
 /**
@@ -209,13 +210,13 @@ public abstract class AppJob {
 						new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(context.getFireTime()),
 						context.getScheduler().getSchedulerInstanceId() });
 	}
-	
-	protected static String getCarregaName(String name) {
-		return getJobName("carrega-" + name);
+
+	protected static String getCarregaName(TarefaId rotina) {
+		return getJobName("carrega-" + rotina.getCodigo());
 	}
-	
-	protected static String getProcessaName(String name) {
-		return getJobName("processa-" + name);
+
+	protected static String getProcessaName(TarefaId rotina) {
+		return getJobName("processa-" + rotina.getCodigo());
 	}
 
 	private static String getJobName(String name) {

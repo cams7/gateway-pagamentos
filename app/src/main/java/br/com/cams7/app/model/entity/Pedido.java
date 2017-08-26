@@ -143,9 +143,12 @@ public class Pedido implements Serializable {
 		// Manual Shopline do Itaú
 		// Página 28
 		// 2.5.3 Consulta Automática à Situação do Pagamento (sonda)
-		NAO_ESCOLHIDO("00", "pagamento ainda não escolhido"), 
-		A_VISTA("01", "pagamento à vista (TEF e CDC)"), 
-		BOLETO("02", "boleto bancário"), 
+		NAO_ESCOLHIDO("00", "pagamento ainda não escolhido"),
+
+		A_VISTA("01", "pagamento à vista (TEF e CDC)"),
+
+		BOLETO("02", "boleto bancário"),
+
 		CARTAO_CREDITO("03", "cartão de crédito");
 
 		private String codigoItau;
@@ -156,7 +159,7 @@ public class Pedido implements Serializable {
 			this.descricao = descricao;
 		}
 
-		protected String getCodigoItau() {
+		public String getCodigoItau() {
 			return codigoItau;
 		}
 
@@ -184,12 +187,17 @@ public class Pedido implements Serializable {
 		// 2.5.3 Consulta Automática à Situação do Pagamento (sonda)
 
 		// On-line e real time
-		EFETUADO("00", "pagamento efetuado"), 
-		NAO_FINALIZADO("01", "situação de pagamento não finalizada (tente novamente)"), 
-		ERRO_PROCESSAMENTO("02", "erro no processamento da consulta (tente novamente)"), 
-		NAO_LOCALIZADO("03", "pagamento não localizado (consulta fora de prazo ou pedido não registrado no banco)"), 
-		BOLETO_EMITIDO("04", "boleto emitido com sucesso"), 
-		AGUARDANDO_COMPENSACAO("05", "pagamento efetuado, aguardando compensação"), 
+		EFETUADO("00", "pagamento efetuado"), NAO_FINALIZADO("01",
+				"situação de pagamento não finalizada (tente novamente)"),
+
+		ERRO_PROCESSAMENTO("02", "erro no processamento da consulta (tente novamente)"),
+
+		NAO_LOCALIZADO("03", "pagamento não localizado (consulta fora de prazo ou pedido não registrado no banco)"),
+
+		BOLETO_EMITIDO("04", "boleto emitido com sucesso"),
+
+		AGUARDANDO_COMPENSACAO("05", "pagamento efetuado, aguardando compensação"),
+
 		NAO_COMPENSADO("06", "pagamento não compensado");
 
 		private String codigoItau;
@@ -200,7 +208,7 @@ public class Pedido implements Serializable {
 			this.descricao = descricao;
 		}
 
-		protected String getCodigoItau() {
+		public String getCodigoItau() {
 			return codigoItau;
 		}
 

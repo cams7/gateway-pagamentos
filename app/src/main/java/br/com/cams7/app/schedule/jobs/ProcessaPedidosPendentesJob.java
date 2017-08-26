@@ -1,5 +1,10 @@
 package br.com.cams7.app.schedule.jobs;
 
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_A_VISTA;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_BOLETOS;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_CARTOES_CREDITO;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_NAO_ESCOLHIDOS;
+
 import java.util.List;
 import java.util.logging.Level;
 
@@ -26,11 +31,6 @@ import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
 public class ProcessaPedidosPendentesJob extends AppJob implements Job {
 
 	public static String JOB_GROUP = "pedidos-pendentes";
-
-	public static String PAGAMENTOS_NAO_ESCOLHIDOS = "pagamentos-nao-escolhidos";
-	public static String PAGAMENTOS_A_VISTA = "pagamentos-a-vista";
-	public static String PAGAMENTOS_CARTOES_CREDITO = "pagamentos-cartoes-credito";
-	public static String PAGAMENTOS_BOLETOS = "pagamento-boletos";
 
 	public static JobKey PROCESSA_PAGAMENTOS_NAO_ESCOLHIDOS = JobKey.jobKey(getProcessaName(PAGAMENTOS_NAO_ESCOLHIDOS),
 			JOB_GROUP);

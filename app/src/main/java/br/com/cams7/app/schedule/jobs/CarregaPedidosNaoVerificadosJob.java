@@ -1,7 +1,7 @@
 package br.com.cams7.app.schedule.jobs;
 
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PEDIDOS_NAO_VERIFICADOS;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosNaoVerificadosJob.JOB_GROUP;
-import static br.com.cams7.app.schedule.jobs.ProcessaPedidosNaoVerificadosJob.PEDIDOS_NAO_VERIFICADOS;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosNaoVerificadosJob.PROCESSA_PEDIDOS_NAO_VERIFICADOS;
 
 import java.util.List;

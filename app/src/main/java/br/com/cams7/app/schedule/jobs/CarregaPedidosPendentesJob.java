@@ -1,11 +1,11 @@
 package br.com.cams7.app.schedule.jobs;
 
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_A_VISTA;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_BOLETOS;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_CARTOES_CREDITO;
+import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_NAO_ESCOLHIDOS;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.FORMA_PAGAMENTO;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.JOB_GROUP;
-import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PAGAMENTOS_A_VISTA;
-import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PAGAMENTOS_BOLETOS;
-import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PAGAMENTOS_CARTOES_CREDITO;
-import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PAGAMENTOS_NAO_ESCOLHIDOS;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_A_VISTA;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_BOLETOS;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_CARTOES_CREDITO;
@@ -25,6 +25,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
 import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
+import br.com.cams7.app.model.entity.Tarefa.TarefaId;
 
 /**
  * @author cesaram
@@ -81,11 +82,11 @@ public class CarregaPedidosPendentesJob extends AppJob implements Job {
 
 	}
 
-	private void carregaPedidosPendentes(Scheduler scheduler, JobKey jobKey, String tipo, List<Long> pedidos)
+	private void carregaPedidosPendentes(Scheduler scheduler, JobKey jobKey, TarefaId rotina, List<Long> pedidos)
 			throws SchedulerException {
 		pauseOrRestartJob(scheduler, jobKey, pedidos.isEmpty());
 
-		getPedidosEncontrados().adiciona(tipo, pedidos);
+		getPedidosEncontrados().adiciona(rotina, pedidos);
 	}
 
 	private void exibeMensagem(String tipoPagamento, List<Long> pedidos) {
