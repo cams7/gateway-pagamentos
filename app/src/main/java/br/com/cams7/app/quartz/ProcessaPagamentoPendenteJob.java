@@ -20,7 +20,7 @@ import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
  */
 @DisallowConcurrentExecution
 // @ExecuteInJTATransaction
-public class ProcessaPagamentoPendenteJob extends ProcessaPagamento implements Job {
+public class ProcessaPagamentoPendenteJob extends AppJob implements Job {
 
 	public static String FORMA_PAGAMENTO = "FormaPagamento";
 
@@ -32,11 +32,9 @@ public class ProcessaPagamentoPendenteJob extends ProcessaPagamento implements J
 
 			Pedido pedido = getPedidoRepository().buscaPedidoPendente(formaPagamento);
 			if (pedido != null)
-				processaPagamento(pedido);
+				processaPedido(pedido);
 
-			LOG.log(Level.INFO, "Trigger: {0}, Fired at: {1}, Instance: {2}",
-					new Object[] { context.getTrigger().getKey(), SDF.format(context.getFireTime()),
-							context.getScheduler().getSchedulerInstanceId() });
+			showJobLog(context);
 		} catch (SchedulerException e) {
 			LOG.log(Level.SEVERE, e.getMessage());
 		}

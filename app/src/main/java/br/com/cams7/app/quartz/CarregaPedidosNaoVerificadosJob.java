@@ -1,5 +1,8 @@
 package br.com.cams7.app.quartz;
 
+import static br.com.cams7.app.quartz.ProcessaPedidosNaoVerificadosJob.PROCESSA_PEDIDOS_NAO_VERIFICADOS;
+import static br.com.cams7.app.quartz.ProcessaPedidosNaoVerificadosJob.PEDIDOS_NAO_VERIFICADOS;
+
 import java.util.List;
 import java.util.logging.Level;
 
@@ -19,38 +22,36 @@ import org.quartz.SchedulerException;
  */
 @DisallowConcurrentExecution
 // @ExecuteInJTATransaction
-public class CarregaPedidosNaoVerificadosJob extends ProcessaPagamento implements Job {
+public class CarregaPedidosNaoVerificadosJob extends AppJob implements Job {
 
-	private static String JOB_NAME = "carrega-pedidos-nao-verificados";
-	public static JobKey CARREGA_PEDIDOS_NAO_VERIFICADOS = JobKey.jobKey(JOB_NAME + "-job",
-			ProcessaPagamentoNaoVerificadoJob.JOB_GROUP);
+	public static String JOB_GROUP = "pedidos-nao-verificados";
+	private static String JOB_NAME = "carrega-" + JOB_GROUP;
+
+	public static JobKey CARREGA_PEDIDOS_NAO_VERIFICADOS = JobKey.jobKey(getJobName(JOB_NAME), JOB_GROUP);
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
 			Scheduler scheduler = context.getScheduler();
 
-			if (scheduler.checkExists(ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO)) {
-				boolean paused = isPaused(scheduler, ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO);
+			if (scheduler.checkExists(PROCESSA_PEDIDOS_NAO_VERIFICADOS)) {
 
-				List<Long> pedidos = getPedidoRepository().buscaIdsPedidosNaoVerificados();
-				System.out.println("Carrega: " + pedidos);
+				List<Long> pedidos = getPedidoRepository().buscaPedidosNaoVerificados();
 
-				if (pedidos.isEmpty()) {
-					if (!paused)
-						scheduler.pauseJob(ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO);
-				} else {
-					if (paused)
-						scheduler.resumeJob(ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO);
+				boolean empty = pedidos.isEmpty();
 
-					getPagamentos().add(ProcessaPagamentoNaoVerificadoJob.PAGAMENTOS_NAO_VERIFICADOS, pedidos);
+				pauseOrRestartJob(scheduler, PROCESSA_PEDIDOS_NAO_VERIFICADOS, empty);
 
-				}
+				getPedidosEncontrados().adiciona(PEDIDOS_NAO_VERIFICADOS, pedidos);
+
+				if (!empty)
+					LOG.log(Level.INFO, "Os pedidos {0} foram carregados.", new Object[] { pedidos });
+				else
+					LOG.info("Nenhum pedido foi carregado.");
+
 			}
 
-			LOG.log(Level.INFO, "Trigger: {0}, Fired at: {1}, Instance: {2}",
-					new Object[] { context.getTrigger().getKey(), SDF.format(context.getFireTime()),
-							context.getScheduler().getSchedulerInstanceId() });
+			showJobLog(context);
 		} catch (SchedulerException e) {
 			LOG.log(Level.SEVERE, e.getMessage());
 		}

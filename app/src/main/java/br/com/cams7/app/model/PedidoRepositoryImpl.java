@@ -125,7 +125,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 	}
 
 	@Override
-	public List<Long> buscaIdsPedidosNaoVerificados() {
+	public List<Long> buscaPedidosNaoVerificados() {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
 

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +26,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -43,71 +43,64 @@ import br.com.cams7.app.model.PedidoRepository;
 import br.com.cams7.app.model.entity.Pedido;
 import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
 import br.com.cams7.app.model.entity.Pedido.SituacaoPagamento;
+import br.com.cams7.app.util.AppException;
 
 /**
  * @author cesaram
  *
  */
-public abstract class ProcessaPagamento {
+public abstract class AppJob {
 
 	protected final Logger LOG = Logger.getLogger(getClass().getSimpleName());
-
-	protected final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss");
 
 	private final int HTTP_OK = 200;
 
 	@Inject
-	private ParamentosBean pagamentos;
+	private PedidosEncontradosBean pedidosEncontrados;
 
 	@EJB
 	private PedidoRepository pedidoRepository;
 
-	protected void processaPagamento(Pedido pedido) {
-		try {
-			Document document = getRespostaItau(1, pedido.getId());
-			List<ItauParametro> parametros = getItauParametros(document);
+	protected void processaPedido(Pedido pedido) {
+		Document document = getRespostaItau(1, pedido.getId());
+		List<ItauParametro> parametros = getItauParametros(document);
 
-			if (parametros != null)
-				for (ItauParametro parametro : parametros) {
-					Long pedidoId = Long.valueOf(parametro.getPedido());
+		for (ItauParametro parametro : parametros) {
+			Long pedidoId = Long.valueOf(parametro.getPedido());
 
-					if (pedidoId.equals(pedido.getId())) {
-						Float valorPago = Float.valueOf(parametro.getValor());
-						FormaPagamento formaPagamento = FormaPagamento.getFormaPagamento(parametro.getTipPag());
-						SituacaoPagamento situacaoPagamento = SituacaoPagamento
-								.getSituacaoPagamento(parametro.getSitPag());
+			if (!pedidoId.equals(pedido.getId()))
+				throw new AppException(String.format(
+						"O número do pedido (%s), retornado pelo Banco Itaú, não é o mesmo número (%s) que está cadastrado na base de dados",
+						pedidoId, pedido.getId()));
 
-						String diaDoMes = parametro.getDtPag().substring(0, 2);
-						String mes = parametro.getDtPag().substring(2, 4);
-						String ano = parametro.getDtPag().substring(4);
+			Float valorPago = Float.valueOf(parametro.getValor());
+			FormaPagamento formaPagamento = FormaPagamento.getFormaPagamento(parametro.getTipPag());
+			SituacaoPagamento situacaoPagamento = SituacaoPagamento.getSituacaoPagamento(parametro.getSitPag());
 
-						Calendar calendar = Calendar.getInstance();
-						calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(diaDoMes));
-						calendar.set(Calendar.MONTH, Integer.valueOf(mes) - 1);
-						calendar.set(Calendar.YEAR, Integer.valueOf(ano));
+			String diaDoMes = parametro.getDtPag().substring(0, 2);
+			String mes = parametro.getDtPag().substring(2, 4);
+			String ano = parametro.getDtPag().substring(4);
 
-						Date dataPagamento = calendar.getTime();
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(diaDoMes));
+			calendar.set(Calendar.MONTH, Integer.valueOf(mes) - 1);
+			calendar.set(Calendar.YEAR, Integer.valueOf(ano));
 
-						pedido.setValorPago(valorPago);
-						pedido.setFormaPagamento(formaPagamento);
-						pedido.setSituacaoPagamento(situacaoPagamento);
-						pedido.setDataPagamento(dataPagamento);
+			Date dataPagamento = calendar.getTime();
 
-						getPedidoRepository().atualiza(pedido);
-					}
+			pedido.setValorPago(valorPago);
+			pedido.setFormaPagamento(formaPagamento);
+			pedido.setSituacaoPagamento(situacaoPagamento);
+			pedido.setDataPagamento(dataPagamento);
 
-				}
-
-			LOG.log(Level.INFO, "O pedido {0} foi processado...", new Object[] { SDF.format(pedido.getDataPedido()) });
-		} catch (IOException e) {
-			LOG.log(Level.SEVERE, e.getMessage());
+			getPedidoRepository().atualiza(pedido);
 		}
+
+		LOG.log(Level.INFO, "O pedido ({0}) foi processado...", new Object[] { pedido.getId() });
+
 	}
 
 	private List<ItauParametro> getItauParametros(Document document) {
-		if (document == null)
-			return null;
-
 		Element eConsulta = document.getDocumentElement();
 
 		// element.normalize();
@@ -138,10 +131,11 @@ public abstract class ProcessaPagamento {
 
 						try {
 							ItauParametro.class.getMethod(fieldName, String.class).invoke(itauParametro, VALUE);
-						} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException
+						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
 								| NoSuchMethodException | SecurityException e) {
-							LOG.log(Level.SEVERE, e.getMessage());
+							throw new AppException(e);
 						}
+
 					}
 				}
 
@@ -152,7 +146,7 @@ public abstract class ProcessaPagamento {
 		return itauParametros;
 	}
 
-	private Document getRespostaItau(Integer codigoEmpresa, Long codigoPedido) throws IOException {
+	private Document getRespostaItau(Integer codigoEmpresa, Long codigoPedido) {
 		final String USER_AGENT = "Mozilla/5.0";
 
 		final String URL = "http://localhost:8090/gateway-pagamentos-api/consulta";
@@ -166,29 +160,38 @@ public abstract class ProcessaPagamento {
 		List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
 		urlParameters.add(new BasicNameValuePair("DC", String.format("%s;%s;00", codigoPedido, codigoEmpresa)));
 
-		request.setEntity(new UrlEncodedFormEntity(urlParameters));
+		try {
+			request.setEntity(new UrlEncodedFormEntity(urlParameters));
 
-		HttpResponse response = client.execute(request);
+			HttpResponse response = client.execute(request);
 
-		int statusCode = response.getStatusLine().getStatusCode();
-		if (statusCode == HTTP_OK) {
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode != HTTP_OK)
+				throw new AppException(String.format("O código de estado HTTP (%s) é inválido", statusCode));
+
 			InputStream content = response.getEntity().getContent();
 
-			try {
-				Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(content);
-				return document;
-			} catch (SAXException | ParserConfigurationException e) {
-				LOG.log(Level.SEVERE, e.getMessage());
-			}
-		} else
-			LOG.log(Level.WARNING, "O código de estado HTTP ({0}) é inválido", new Object[] { statusCode });
+			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(content);
+			return document;
 
-		return null;
+		} catch (IOException | SAXException | ParserConfigurationException e) {
+			throw new AppException(e);
+		}
+	}
+
+	protected void pauseOrRestartJob(Scheduler scheduler, JobKey jobKey, boolean pause) throws SchedulerException {
+		boolean paused = isPaused(scheduler, jobKey);
+
+		if (pause) {
+			if (!paused)
+				scheduler.pauseJob(jobKey);
+		} else if (paused)
+			scheduler.resumeJob(jobKey);
 
 	}
 
-	protected boolean isPaused(Scheduler scheduler, JobKey key) throws SchedulerException {
-		List<? extends Trigger> triggers = scheduler.getTriggersOfJob(key);
+	private boolean isPaused(Scheduler scheduler, JobKey jobKey) throws SchedulerException {
+		List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
 		for (Trigger trigger : triggers) {
 			TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
 
@@ -199,12 +202,23 @@ public abstract class ProcessaPagamento {
 		return false;
 	}
 
+	protected void showJobLog(JobExecutionContext context) throws SchedulerException {
+		LOG.log(Level.INFO, "Trigger: {0}, Fired at: {1}, Instance: {2}",
+				new Object[] { context.getTrigger().getKey(),
+						new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(context.getFireTime()),
+						context.getScheduler().getSchedulerInstanceId() });
+	}
+
+	protected static String getJobName(String name) {
+		return name + "-job";
+	}
+
 	protected PedidoRepository getPedidoRepository() {
 		return pedidoRepository;
 	}
 
-	protected ParamentosBean getPagamentos() {
-		return pagamentos;
+	protected PedidosEncontradosBean getPedidosEncontrados() {
+		return pedidosEncontrados;
 	}
 
 }

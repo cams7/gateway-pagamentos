@@ -19,12 +19,12 @@
 		<app.database>app</app.database>
 
 		<!-- db.driverClassName>org.h2.Driver</db.driverClassName>
-		<db.connection.url>jdbc:h2:file:/Dev/Vagrant/teste/github/gateway-pagamentos/api/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</db.connection.url>
+		<db.connection.url>jdbc:h2:file:/Desenv/Github/emp1/gateway-pagamentos/api/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</db.connection.url>
 		<db.username>sa</db.username>
 		<db.password>sa</db.password-->
 
 		<db.driverClassName>org.sqlite.JDBC</db.driverClassName>
-		<db.connection.url>jdbc:sqlite:/Dev/Vagrant/teste/github/gateway-pagamentos/api/db/${app.database}.sqlite</db.connection.url>
+		<db.connection.url>jdbc:sqlite:/Desenv/Github/emp1/gateway-pagamentos/api/db/${app.database}.sqlite</db.connection.url>
 		<db.username></db.username>
 		<db.password></db.password>
 	</properties>
@@ -70,8 +70,8 @@
 				</os>
 			</activation>
 			<properties>
-				<!-- db.connection.url>jdbc:h2:file:/vagrant/github/gateway-pagamentos/api/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</db.connection.url-->
-				<db.connection.url>jdbc:sqlite:/vagrant/github/gateway-pagamentos/api/db/${app.database}.sqlite</db.connection.url>
+				<!-- db.connection.url>jdbc:h2:file:/home/vagrant/github/gateway-pagamentos/api/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</db.connection.url-->
+				<db.connection.url>jdbc:sqlite:/home/vagrant/github/gateway-pagamentos/api/db/${app.database}.sqlite</db.connection.url>
 			</properties>
 		</profile>
 	</profiles>

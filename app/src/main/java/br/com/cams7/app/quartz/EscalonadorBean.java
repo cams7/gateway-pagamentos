@@ -27,6 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
 
+import static br.com.cams7.app.quartz.CarregaPedidosNaoVerificadosJob.CARREGA_PEDIDOS_NAO_VERIFICADOS;
+import static br.com.cams7.app.quartz.ProcessaPedidosNaoVerificadosJob.PROCESSA_PEDIDOS_NAO_VERIFICADOS;
+
 @Startup
 @Singleton
 public class EscalonadorBean {
@@ -38,6 +41,22 @@ public class EscalonadorBean {
 	@Inject
 	private JobFactory jobFactory;
 
+	/**
+	 * Field Name 	Mandatory 	Allowed Values 	 Allowed Special Characters
+	 * Seconds 	    YES 	    0-59 	         , - * /
+	 * Minutes 	    YES 	    0-59 	         , - * /
+	 * Hours 	    YES 	    0-23 	         , - * /
+	 * Day of month YES 	    1-31 	         , - * ? / L W
+	 * Month 	    YES 	    1-12 or JAN-DEC  , - * /
+	 * Day of week 	YES 	    1-7 or SUN-SAT 	 , - * ? / L #
+	 * Year 	    NO 	        empty, 1970-2099 , - * /
+	 *
+	 *
+	* Segundos, Minutos, Horas, Dia do Mês, Mês, Dia da Semana e Ano (Opcional)
+	* Exemplo:
+	* 0 0 12 ? * WED A tarefa será executada todas às quartas-feiras às 12:00pm
+	* 0 0 8,12 * * * A tarefa será executada todos os dias, às 08:00am e 12:00pm
+	*/
 	@PostConstruct
 	public void scheduleJobs() {
 
@@ -51,36 +70,20 @@ public class EscalonadorBean {
 			final String PAGAMENTO_CARTAO_CREDITO_JOB = "pagamento-cartao-credito-job";
 			final String PAGAMENTO_BOLETO_JOB = "pagamento-boleto-job";
 
-			// Carrega pedidos não verificados
+			// Carrega os pedidos não verificados
 			JobDetail carregaPedidosNaoVerificadosJob = JobBuilder.newJob(CarregaPedidosNaoVerificadosJob.class)
-					.withIdentity(CarregaPedidosNaoVerificadosJob.CARREGA_PEDIDOS_NAO_VERIFICADOS).build();
-			
-			
-			/**
-			 * Field Name 	Mandatory 	Allowed Values 	 Allowed Special Characters
-			 * Seconds 	    YES 	    0-59 	         , - * /
-			 * Minutes 	    YES 	    0-59 	         , - * /
-			 * Hours 	    YES 	    0-23 	         , - * /
-			 * Day of month YES 	    1-31 	         , - * ? / L W
-			 * Month 	    YES 	    1-12 or JAN-DEC  , - * /
-			 * Day of week 	YES 	    1-7 or SUN-SAT 	 , - * ? / L #
-			 * Year 	    NO 	        empty, 1970-2099 , - * /
-			 */
-
-			//Segundos, Minutos, Horas, Dia do Mês, Mês, Dia da Semana e Ano (Opcional)
-			//Exemplo:
-			//0 0 12 ? * WED A tarefa será executada todas às quartas-feiras às 12:00pm
-			//0 0 8,12 * * * A tarefa será executada todos os dias, às 08:00am e 12:00pm
+					.withIdentity(CARREGA_PEDIDOS_NAO_VERIFICADOS).build();
+						
 			Trigger carregaPedidosNaoVerificadosTrigger = TriggerBuilder.newTrigger()
-					.withIdentity(getTriggerName(CarregaPedidosNaoVerificadosJob.CARREGA_PEDIDOS_NAO_VERIFICADOS))
-					.startNow().withSchedule(CronScheduleBuilder.cronSchedule("0/30 * * * * ?")).build();
+					.withIdentity(getTriggerName(CARREGA_PEDIDOS_NAO_VERIFICADOS))
+					.withSchedule(CronScheduleBuilder.cronSchedule("0/30 * * * * ?")).build();
 
-			// Processa pagamento não verificado
-			JobDetail pagamentoNaoVerificadoJob = JobBuilder.newJob(ProcessaPagamentoNaoVerificadoJob.class)
-					.withIdentity(ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO).build();
+			// Processa os pedidos não verificados
+			JobDetail processaPedidosNaoVerificadosJob = JobBuilder.newJob(ProcessaPedidosNaoVerificadosJob.class)
+					.withIdentity(PROCESSA_PEDIDOS_NAO_VERIFICADOS).build();
 
-			Trigger pagamentoNaoVerificadoTrigger = TriggerBuilder.newTrigger()
-					.withIdentity(getTriggerName(ProcessaPagamentoNaoVerificadoJob.PAGAMENTO_NAO_VERIFICADO)).startNow()
+			Trigger processaPedidosNaoVerificadosTrigger = TriggerBuilder.newTrigger()
+					.withIdentity(getTriggerName(PROCESSA_PEDIDOS_NAO_VERIFICADOS))
 					.withSchedule(CronScheduleBuilder.cronSchedule("0/5 * * * * ?")).build();
 
 //			// Processa pagamento não escolhido
@@ -127,7 +130,7 @@ public class EscalonadorBean {
 								// on startup
 			scheduler.scheduleJob(carregaPedidosNaoVerificadosJob, newHashSet(carregaPedidosNaoVerificadosTrigger),
 					true);
-			scheduler.scheduleJob(pagamentoNaoVerificadoJob, newHashSet(pagamentoNaoVerificadoTrigger), true);
+			scheduler.scheduleJob(processaPedidosNaoVerificadosJob, newHashSet(processaPedidosNaoVerificadosTrigger), true);
 //			scheduler.scheduleJob(pagamentoNaoEscolhidoJob, newHashSet(pagamentoNaoEscolhidoTrigger), true);
 //			scheduler.scheduleJob(pagamentoAVistaJob, newHashSet(pagamentoAVistaTrigger), true);
 //			scheduler.scheduleJob(pagamentoCartaoCreditoJob, newHashSet(pagamentoCartaoCreditoTrigger), true);

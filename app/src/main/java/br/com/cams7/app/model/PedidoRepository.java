@@ -25,5 +25,5 @@ public interface PedidoRepository {
 
 	void atualiza(Pedido pedido);
 
-	List<Long> buscaIdsPedidosNaoVerificados();
+	List<Long> buscaPedidosNaoVerificados();
 }

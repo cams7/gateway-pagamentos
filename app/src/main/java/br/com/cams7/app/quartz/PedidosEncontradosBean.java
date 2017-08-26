@@ -15,7 +15,7 @@ import javax.enterprise.context.ApplicationScoped;
  *
  */
 @ApplicationScoped
-public class ParamentosBean {
+public class PedidosEncontradosBean {
 	private Map<String, List<Long>> parameters;
 
 	@PostConstruct
@@ -23,11 +23,11 @@ public class ParamentosBean {
 		parameters = new HashMap<>();
 	}
 
-	public void add(String key, List<Long> ids) {
+	public void adiciona(String key, List<Long> ids) {
 		parameters.put(key, ids);
 	}
 
-	public List<Long> get(String key) {
+	public List<Long> getPedidos(String key) {
 		return parameters.get(key);
 	}
 }
