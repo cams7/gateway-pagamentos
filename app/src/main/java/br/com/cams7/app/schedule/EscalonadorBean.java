@@ -32,6 +32,7 @@ import javax.ejb.Startup;
 import javax.inject.Inject;
 
 import org.quartz.CronScheduleBuilder;
+import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -47,7 +48,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import br.com.cams7.app.model.TarefaRepository;
+import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
 import br.com.cams7.app.model.entity.Tarefa;
+import br.com.cams7.app.model.entity.Tarefa.TarefaId;
 import br.com.cams7.app.schedule.jobs.CarregaPedidosNaoVerificadosJob;
 import br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob;
 import br.com.cams7.app.schedule.jobs.ProcessaPedidosNaoVerificadosJob;
@@ -57,7 +60,7 @@ import br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob;
 @Singleton
 public class EscalonadorBean {
 
-	private Logger LOG = LoggerFactory.getLogger(EscalonadorBean.class);
+	private Logger LOG = LoggerFactory.getLogger(getClass().getName());
 
 	private Scheduler scheduler;
 
@@ -74,19 +77,19 @@ public class EscalonadorBean {
 			scheduler.setJobFactory(jobFactory);
 
 			// Pedidos não verificados
-			pedidosNaoVerificados();
+			registraPedidosNaoVerificados();
 
 			// Pagamentos não escolhidos
-			pagamentosNaoEscolhidos();
+			registraPagamentosNaoEscolhidos();
 
 			// Pagamentos à vista
-			pagamentosAVista();
+			registraPagamentosAVista();
 
 			// Pagamentos realizados por cartões de crédito
-			pagamentosCartoesCredito();
+			registraPagamentosCartoesCredito();
 
 			// Pagamentos realizados por boletos bancário
-			pagamentosBoletos();
+			registraPagamentosBoletos();
 
 			scheduler.start(); // starting a scheduler before scheduling jobs helped in getting rid of deadlock
 								// on startup
@@ -98,159 +101,126 @@ public class EscalonadorBean {
 	}
 
 	/**
-	 * Registra as rotinas que verifica os pedidos que ainda não foram processados
+	 * Registra a tarefa que verifica os pedidos que ainda não foram processados
 	 * 
 	 * @throws SchedulerException
 	 */
-	private void pedidosNaoVerificados() throws SchedulerException {
-		Tarefa tarefa = tarefaRepository.buscaPeloId(PEDIDOS_NAO_VERIFICADOS);
-		
-		// Carrega os pedidos não verificados
-		JobDetail carregaPedidosNaoVerificadosJob = JobBuilder.newJob(CarregaPedidosNaoVerificadosJob.class)
-				.withIdentity(CARREGA_PEDIDOS_NAO_VERIFICADOS).build();
-
-		Trigger carregaPedidosNaoVerificadosTrigger = TriggerBuilder.newTrigger()
-				.withIdentity(getTriggerName(CARREGA_PEDIDOS_NAO_VERIFICADOS))
-				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getCarregaCron())).build();
-
-		// Processa os pedidos não verificados
-		JobDetail processaPedidosNaoVerificadosJob = JobBuilder.newJob(ProcessaPedidosNaoVerificadosJob.class)
-				.withIdentity(PROCESSA_PEDIDOS_NAO_VERIFICADOS).build();
-
-		Trigger processaPedidosNaoVerificadosTrigger = TriggerBuilder.newTrigger()
-				.withIdentity(getTriggerName(PROCESSA_PEDIDOS_NAO_VERIFICADOS))
-				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getProcessaCron())).build();
-
-		scheduler.scheduleJob(carregaPedidosNaoVerificadosJob, newHashSet(carregaPedidosNaoVerificadosTrigger), true);
-		scheduler.scheduleJob(processaPedidosNaoVerificadosJob, newHashSet(processaPedidosNaoVerificadosTrigger), true);
+	private void registraPedidosNaoVerificados() throws SchedulerException {
+		registraTarefa(PEDIDOS_NAO_VERIFICADOS, null, CarregaPedidosNaoVerificadosJob.class,
+				CARREGA_PEDIDOS_NAO_VERIFICADOS, ProcessaPedidosNaoVerificadosJob.class,
+				PROCESSA_PEDIDOS_NAO_VERIFICADOS);
 	}
 
 	/**
-	 * Registra as rotinas que verifica os pagamentos não escolhidos retornados pela
+	 * Registra a tarefa que verifica os pagamentos não escolhidos retornados pela
 	 * API do Banco Itaú
 	 * 
 	 * @throws SchedulerException
 	 */
-	private void pagamentosNaoEscolhidos() throws SchedulerException {
-		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_NAO_ESCOLHIDOS);
-		
-		// Carrega os pagamentos não escolhidos
-		JobDetail carregaPagamentosNaoEscolhidosJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
-				.withIdentity(CARREGA_PAGAMENTOS_NAO_ESCOLHIDOS).build();
-		carregaPagamentosNaoEscolhidosJob.getJobDataMap().put(FORMA_PAGAMENTO, NAO_ESCOLHIDO);
-
-		Trigger carregaPagamentosNaoEscolhidosTrigger = TriggerBuilder.newTrigger()
-				.withIdentity(getTriggerName(CARREGA_PAGAMENTOS_NAO_ESCOLHIDOS))
-				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getCarregaCron())).build();
-
-		// Processa os pagamentos não escolhidos
-		JobDetail processaPagamentosNaoEscolhidosJob = JobBuilder.newJob(ProcessaPedidosPendentesJob.class)
-				.withIdentity(PROCESSA_PAGAMENTOS_NAO_ESCOLHIDOS).build();
-		processaPagamentosNaoEscolhidosJob.getJobDataMap().put(FORMA_PAGAMENTO, NAO_ESCOLHIDO);
-
-		Trigger processaPagamentosNaoEscolhidosTrigger = TriggerBuilder.newTrigger()
-				.withIdentity(getTriggerName(PROCESSA_PAGAMENTOS_NAO_ESCOLHIDOS))
-				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getProcessaCron())).build();
-
-		scheduler.scheduleJob(carregaPagamentosNaoEscolhidosJob, newHashSet(carregaPagamentosNaoEscolhidosTrigger),
-				true);
-		scheduler.scheduleJob(processaPagamentosNaoEscolhidosJob, newHashSet(processaPagamentosNaoEscolhidosTrigger),
-				true);
+	private void registraPagamentosNaoEscolhidos() throws SchedulerException {
+		registraPagamentos(PAGAMENTOS_NAO_ESCOLHIDOS, NAO_ESCOLHIDO, CARREGA_PAGAMENTOS_NAO_ESCOLHIDOS,
+				PROCESSA_PAGAMENTOS_NAO_ESCOLHIDOS);
 	}
 
 	/**
-	 * Registra as rotinas que verifica os pagamentos à vista retornados pela API do
+	 * Registra a tarefa que verifica os pagamentos à vista retornados pela API do
 	 * Banco Itaú
 	 * 
 	 * @throws SchedulerException
 	 */
-	private void pagamentosAVista() throws SchedulerException {
-		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_A_VISTA);
-		
-		// Carrega os pagamentos à vista
-		JobDetail carregaPagamentosAVistaJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
-				.withIdentity(CARREGA_PAGAMENTOS_A_VISTA).build();
-		carregaPagamentosAVistaJob.getJobDataMap().put(FORMA_PAGAMENTO, A_VISTA);
-
-		Trigger carregaPagamentosAVistaTrigger = TriggerBuilder.newTrigger()
-				.withIdentity(getTriggerName(CARREGA_PAGAMENTOS_A_VISTA))
-				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getCarregaCron())).build();
-
-		// Processa os pagamentos à vista
-		JobDetail processaPagamentosAVistaJob = JobBuilder.newJob(ProcessaPedidosPendentesJob.class)
-				.withIdentity(PROCESSA_PAGAMENTOS_A_VISTA).build();
-		processaPagamentosAVistaJob.getJobDataMap().put(FORMA_PAGAMENTO, A_VISTA);
-
-		Trigger processaPagamentosAVistaTrigger = TriggerBuilder.newTrigger()
-				.withIdentity(getTriggerName(PROCESSA_PAGAMENTOS_A_VISTA))
-				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getProcessaCron())).build();
-
-		scheduler.scheduleJob(carregaPagamentosAVistaJob, newHashSet(carregaPagamentosAVistaTrigger), true);
-		scheduler.scheduleJob(processaPagamentosAVistaJob, newHashSet(processaPagamentosAVistaTrigger), true);
+	private void registraPagamentosAVista() throws SchedulerException {
+		registraPagamentos(PAGAMENTOS_A_VISTA, A_VISTA, CARREGA_PAGAMENTOS_A_VISTA, PROCESSA_PAGAMENTOS_A_VISTA);
 	}
 
 	/**
-	 * Registra as rotinas que verifica os pagamentos realizados por cartões de
+	 * Registra a tarefa que verifica os pagamentos realizados por cartões de
 	 * crédito retornados pela API do Banco Itaú
 	 * 
 	 * @throws SchedulerException
 	 */
-	private void pagamentosCartoesCredito() throws SchedulerException {
-		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_CARTOES_CREDITO);
-		
-		// Carrega os pagamentos realizados por cartões de crédito
-		JobDetail carregaPagamentosCartoesCreditoJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
-				.withIdentity(CARREGA_PAGAMENTOS_CARTOES_CREDITO).build();
-		carregaPagamentosCartoesCreditoJob.getJobDataMap().put(FORMA_PAGAMENTO, CARTAO_CREDITO);
-
-		Trigger carregaPagamentosCartoesCreditoTrigger = TriggerBuilder.newTrigger()
-				.withIdentity(getTriggerName(CARREGA_PAGAMENTOS_CARTOES_CREDITO))
-				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getCarregaCron())).build();
-
-		// Processa os pagamentos realizados por cartões de crédito
-		JobDetail processaPagamentosCartoesCreditoJob = JobBuilder.newJob(ProcessaPedidosPendentesJob.class)
-				.withIdentity(PROCESSA_PAGAMENTOS_CARTOES_CREDITO).build();
-		processaPagamentosCartoesCreditoJob.getJobDataMap().put(FORMA_PAGAMENTO, CARTAO_CREDITO);
-
-		Trigger processaPagamentosCartoesCreditoTrigger = TriggerBuilder.newTrigger()
-				.withIdentity(getTriggerName(PROCESSA_PAGAMENTOS_CARTOES_CREDITO))
-				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getProcessaCron())).build();
-
-		scheduler.scheduleJob(carregaPagamentosCartoesCreditoJob, newHashSet(carregaPagamentosCartoesCreditoTrigger),
-				true);
-		scheduler.scheduleJob(processaPagamentosCartoesCreditoJob, newHashSet(processaPagamentosCartoesCreditoTrigger),
-				true);
+	private void registraPagamentosCartoesCredito() throws SchedulerException {
+		registraPagamentos(PAGAMENTOS_CARTOES_CREDITO, CARTAO_CREDITO, CARREGA_PAGAMENTOS_CARTOES_CREDITO,
+				PROCESSA_PAGAMENTOS_CARTOES_CREDITO);
 	}
 
 	/**
-	 * Registra as rotinas que verifica os pagamentos realizados por boletos
-	 * bancário retornados pela API do Banco Itaú
+	 * Registra a tarefa que verifica os pagamentos realizados por boletos bancário
+	 * retornados pela API do Banco Itaú
 	 * 
 	 * @throws SchedulerException
 	 */
-	private void pagamentosBoletos() throws SchedulerException {
-		Tarefa tarefa = tarefaRepository.buscaPeloId(PAGAMENTOS_BOLETOS);
-		
-		// Carrega os pagamentos realizados por boletos bancário
-		JobDetail carregaPagamentosBoletosJob = JobBuilder.newJob(CarregaPedidosPendentesJob.class)
-				.withIdentity(CARREGA_PAGAMENTOS_BOLETOS).build();
-		carregaPagamentosBoletosJob.getJobDataMap().put(FORMA_PAGAMENTO, BOLETO);
+	private void registraPagamentosBoletos() throws SchedulerException {
+		registraPagamentos(PAGAMENTOS_BOLETOS, BOLETO, CARREGA_PAGAMENTOS_BOLETOS, PROCESSA_PAGAMENTOS_BOLETOS);
+	}
 
-		Trigger carregaPagamentosBoletosTrigger = TriggerBuilder.newTrigger()
-				.withIdentity(getTriggerName(CARREGA_PAGAMENTOS_BOLETOS))
+	/**
+	 * Registra a tarefa que verifica os pagamentos retornados pela API do Banco
+	 * Itaú
+	 * 
+	 * @param rotina
+	 *            Rotina de pagamentos
+	 * @param formaPagamento
+	 *            Forma de pagamento
+	 * @param carregaPagamentosKey
+	 *            Carrega pagamentos
+	 * @param processaPagamentosKey
+	 *            Processa pagamentos
+	 * 
+	 * @throws SchedulerException
+	 */
+	private void registraPagamentos(final TarefaId rotina, final FormaPagamento formaPagamento,
+			final JobKey carregaPagamentosKey, final JobKey processaPagamentosKey) throws SchedulerException {
+
+		registraTarefa(rotina, formaPagamento, CarregaPedidosPendentesJob.class, carregaPagamentosKey,
+				ProcessaPedidosPendentesJob.class, processaPagamentosKey);
+	}
+
+	/**
+	 * Registra tarefa no escalonador
+	 * 
+	 * @param rotina
+	 *            Rotina de pagamentos
+	 * @param formaPagamento
+	 *            Forma de pagamento
+	 * @param carregaPagamentosType
+	 *            Job type
+	 * @param carregaPagamentosKey
+	 *            Carrega pagamentos
+	 * @param processaPagamentosType
+	 *            Job Type
+	 * @param processaPagamentosKey
+	 *            Processa pagamentos
+	 * 
+	 * @throws SchedulerException
+	 */
+	private void registraTarefa(final TarefaId rotina, final FormaPagamento formaPagamento,
+			final Class<? extends Job> carregaPagamentosType, final JobKey carregaPagamentosKey,
+			final Class<? extends Job> processaPagamentosType, final JobKey processaPagamentosKey)
+			throws SchedulerException {
+		Tarefa tarefa = tarefaRepository.buscaPeloId(rotina);
+
+		// Registra a tarefa de carregamento
+		JobDetail carregaPagamentosJob = JobBuilder.newJob(carregaPagamentosType).withIdentity(carregaPagamentosKey)
+				.build();
+		if (formaPagamento != null)
+			carregaPagamentosJob.getJobDataMap().put(FORMA_PAGAMENTO, formaPagamento);
+
+		Trigger carregaPagamentosTrigger = TriggerBuilder.newTrigger()
+				.withIdentity(getTriggerName(carregaPagamentosKey))
 				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getCarregaCron())).build();
 
-		// Processa os pagamentos realizados por boletos bancário
-		JobDetail processaPagamentosBoletosJob = JobBuilder.newJob(ProcessaPedidosPendentesJob.class)
-				.withIdentity(PROCESSA_PAGAMENTOS_BOLETOS).build();
-		processaPagamentosBoletosJob.getJobDataMap().put(FORMA_PAGAMENTO, BOLETO);
+		// Registra a tarefa de processamento
+		JobDetail processaPagamentosJob = JobBuilder.newJob(processaPagamentosType).withIdentity(processaPagamentosKey)
+				.build();
+		if (formaPagamento != null)
+			processaPagamentosJob.getJobDataMap().put(FORMA_PAGAMENTO, formaPagamento);
 
-		Trigger processaPagamentosBoletosTrigger = TriggerBuilder.newTrigger()
-				.withIdentity(getTriggerName(PROCESSA_PAGAMENTOS_BOLETOS))
+		Trigger processaPagamentosTrigger = TriggerBuilder.newTrigger()
+				.withIdentity(getTriggerName(processaPagamentosKey))
 				.withSchedule(CronScheduleBuilder.cronSchedule(tarefa.getProcessaCron())).build();
 
-		scheduler.scheduleJob(carregaPagamentosBoletosJob, newHashSet(carregaPagamentosBoletosTrigger), true);
-		scheduler.scheduleJob(processaPagamentosBoletosJob, newHashSet(processaPagamentosBoletosTrigger), true);
+		scheduler.scheduleJob(carregaPagamentosJob, newHashSet(carregaPagamentosTrigger), true);
+		scheduler.scheduleJob(processaPagamentosJob, newHashSet(processaPagamentosTrigger), true);
 	}
 
 	private Set<? extends Trigger> newHashSet(Trigger... trigger) {
