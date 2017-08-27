@@ -57,10 +57,14 @@
 					<h:outputText value="#{o.id}" />
 				</p:column>
 				<p:column headerText="Custo">
-					<h:outputText value="#{o.valorPedido}" />
+					<h:outputText value="#{o.valorPedido}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
 				</p:column>
 				<p:column headerText="Pago">
-					<h:outputText value="#{o.valorPago}" />
+					<h:outputText value="#{o.valorPago}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
 				</p:column>
 				<p:column headerText="Data do pedido">
 					<h:outputText value="#{o.dataPedido}">
@@ -72,15 +76,17 @@
 						<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
 					</h:outputText>
 				</p:column>
-				<p:column headerText="Forma de pagamento">
-					<h:outputText value="#{o.formaPagamento}" />
+				<p:column headerText="Tipo de pagamento">
+					<h:outputText value="#{o.tipoPagamento}" />
 				</p:column>
 				<p:column headerText="Situação">
 					<h:outputText value="#{o.situacaoPagamento}" />
 				</p:column>
 				<p:column>
 					<p:commandButton type="button"
-						onclick="openShopline(#{o.id}, #{o.valorPedido})" value="Shopline" />
+						onclick="openShopline('J0000560680005480000000013', '#{o.id}', '#{o.valorPedidoFormatado}')"
+						value="Shopline"
+						disabled="${o.situacaoPagamento!=null and o.situacaoPagamento != 'NAO_FINALIZADO' and o.situacaoPagamento != 'ERRO_PROCESSAMENTO'}" />
 				</p:column>
 			</p:dataTable>
 		</div>

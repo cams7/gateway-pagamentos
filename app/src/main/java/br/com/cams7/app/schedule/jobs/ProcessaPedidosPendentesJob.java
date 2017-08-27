@@ -4,6 +4,10 @@ import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_A_VISTA;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_BOLETOS;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_CARTOES_CREDITO;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_NAO_ESCOLHIDOS;
+import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_PAGAMENTOS_NAO_ESCOLHIDOS;
+import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_PAGAMENTOS_A_VISTA;
+import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_PAGAMENTOS_CARTOES_CREDITO;
+import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_PAGAMENTOS_BOLETOS;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -19,7 +23,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
 import br.com.cams7.app.model.entity.Pedido;
-import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
+import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
 
 /**
  * @author cesaram
@@ -39,22 +43,23 @@ public class ProcessaPedidosPendentesJob extends AppJob implements Job {
 			.jobKey(getProcessaName(PAGAMENTOS_CARTOES_CREDITO), JOB_GROUP);
 	public static JobKey PROCESSA_PAGAMENTOS_BOLETOS = JobKey.jobKey(getProcessaName(PAGAMENTOS_BOLETOS), JOB_GROUP);
 
-	public static String FORMA_PAGAMENTO = "FormaPagamento";
+	public static String TIPO_PAGAMENTO = "tipo-pagamento";
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		Scheduler scheduler = context.getScheduler();
 		JobDataMap data = context.getJobDetail().getJobDataMap();
-		FormaPagamento formaPagamento = (FormaPagamento) data.get(FORMA_PAGAMENTO);
+		TipoPagamento tipoPagamento = (TipoPagamento) data.get(TIPO_PAGAMENTO);
 
 		try {
-			switch (formaPagamento) {
+			switch (tipoPagamento) {
 			case NAO_ESCOLHIDO: {
 				List<Long> pedidos = getPedidosEncontrados().getPedidos(PAGAMENTOS_NAO_ESCOLHIDOS);
 
 				exibeMensagem("pagamento(s) não escolhido(s)", pedidos);
 
-				processaPedidosPendentes(scheduler, PROCESSA_PAGAMENTOS_NAO_ESCOLHIDOS, pedidos);
+				processaPedidosPendentes(scheduler, CARREGA_PAGAMENTOS_NAO_ESCOLHIDOS,
+						PROCESSA_PAGAMENTOS_NAO_ESCOLHIDOS, pedidos);
 
 				break;
 			}
@@ -63,7 +68,7 @@ public class ProcessaPedidosPendentesJob extends AppJob implements Job {
 
 				exibeMensagem("pagamento(s) à vista", pedidos);
 
-				processaPedidosPendentes(scheduler, PROCESSA_PAGAMENTOS_A_VISTA, pedidos);
+				processaPedidosPendentes(scheduler, CARREGA_PAGAMENTOS_A_VISTA, PROCESSA_PAGAMENTOS_A_VISTA, pedidos);
 
 				break;
 			}
@@ -72,7 +77,8 @@ public class ProcessaPedidosPendentesJob extends AppJob implements Job {
 
 				exibeMensagem("pagamento(s) realizado(s) por cartão(ões) de crédito", pedidos);
 
-				processaPedidosPendentes(scheduler, PROCESSA_PAGAMENTOS_CARTOES_CREDITO, pedidos);
+				processaPedidosPendentes(scheduler, CARREGA_PAGAMENTOS_CARTOES_CREDITO,
+						PROCESSA_PAGAMENTOS_CARTOES_CREDITO, pedidos);
 
 				break;
 			}
@@ -81,7 +87,7 @@ public class ProcessaPedidosPendentesJob extends AppJob implements Job {
 
 				exibeMensagem("pagamento(s) realizado(s) por boleto(s) bancário", pedidos);
 
-				processaPedidosPendentes(scheduler, PROCESSA_PAGAMENTOS_BOLETOS, pedidos);
+				processaPedidosPendentes(scheduler, CARREGA_PAGAMENTOS_BOLETOS, PROCESSA_PAGAMENTOS_BOLETOS, pedidos);
 
 				break;
 			}
@@ -95,11 +101,12 @@ public class ProcessaPedidosPendentesJob extends AppJob implements Job {
 		}
 	}
 
-	private void processaPedidosPendentes(Scheduler scheduler, JobKey jobKey, List<Long> pedidos)
-			throws SchedulerException {
+	private void processaPedidosPendentes(Scheduler scheduler, JobKey carregaJobKey, JobKey processaJobKey,
+			List<Long> pedidos) throws SchedulerException {
 		boolean empty = isEmpty(pedidos);
 
-		pauseOrRestartJob(scheduler, jobKey, empty);
+		pauseOrRestartJob(scheduler, carregaJobKey, !empty);
+		pauseOrRestartJob(scheduler, processaJobKey, empty);
 
 		if (!empty) {
 			Long pedidoId = pedidos.remove(0);

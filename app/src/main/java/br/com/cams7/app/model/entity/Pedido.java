@@ -4,6 +4,7 @@
 package br.com.cams7.app.model.entity;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -39,10 +40,10 @@ public class Pedido implements Serializable {
 
 	@NotNull
 	@Column(name = "valor_pedido")
-	private Float valorPedido;
+	private Double valorPedido;
 
 	@Column(name = "valor_pago")
-	private Float valorPago;
+	private Double valorPago;
 
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
@@ -54,8 +55,8 @@ public class Pedido implements Serializable {
 	private Date dataPagamento;
 
 	@Enumerated(EnumType.ORDINAL)
-	@Column(name = "forma_pagamento")
-	private FormaPagamento formaPagamento;
+	@Column(name = "tipo_pagamento")
+	private TipoPagamento tipoPagamento;
 
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "situacao_pagamento")
@@ -74,6 +75,14 @@ public class Pedido implements Serializable {
 		this.id = id;
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + "[id = " + id + ", valorPedido = " + getValorPedidoFormatado()
+				+ ", valorPago = " + getValorPagoFormatado() + ", dataPedido = " + dataPedido + ", dataPagamento = "
+				+ dataPagamento + ", tipoPagamento = " + tipoPagamento + ", situacaoPagamento = " + situacaoPagamento
+				+ "]";
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -82,19 +91,19 @@ public class Pedido implements Serializable {
 		this.id = id;
 	}
 
-	public Float getValorPedido() {
+	public Double getValorPedido() {
 		return valorPedido;
 	}
 
-	public void setValorPedido(Float valorPedido) {
+	public void setValorPedido(Double valorPedido) {
 		this.valorPedido = valorPedido;
 	}
 
-	public Float getValorPago() {
+	public Double getValorPago() {
 		return valorPago;
 	}
 
-	public void setValorPago(Float valorPago) {
+	public void setValorPago(Double valorPago) {
 		this.valorPago = valorPago;
 	}
 
@@ -114,12 +123,12 @@ public class Pedido implements Serializable {
 		this.dataPagamento = dataPagamento;
 	}
 
-	public FormaPagamento getFormaPagamento() {
-		return formaPagamento;
+	public TipoPagamento getTipoPagamento() {
+		return tipoPagamento;
 	}
 
-	public void setFormaPagamento(FormaPagamento formaPagamento) {
-		this.formaPagamento = formaPagamento;
+	public void setTipoPagamento(TipoPagamento tipoPagamento) {
+		this.tipoPagamento = tipoPagamento;
 	}
 
 	public SituacaoPagamento getSituacaoPagamento() {
@@ -138,8 +147,22 @@ public class Pedido implements Serializable {
 		this.cliente = cliente;
 	}
 
+	public String getValorPedidoFormatado() {
+		String valorFormatado = getValorFormatado(getValorPedido());
+		return valorFormatado;
+	}
+
+	public String getValorPagoFormatado() {
+		String valorFormatado = getValorFormatado(getValorPago());
+		return valorFormatado;
+	}
+
+	public static String getValorFormatado(Double valor) {
+		return new DecimalFormat("#.00").format(valor);
+	}
+
 	// TIPPAG
-	public enum FormaPagamento {
+	public enum TipoPagamento {
 		// Manual Shopline do Itaú
 		// Página 28
 		// 2.5.3 Consulta Automática à Situação do Pagamento (sonda)
@@ -154,7 +177,7 @@ public class Pedido implements Serializable {
 		private String codigoItau;
 		private String descricao;
 
-		private FormaPagamento(String codigoItau, String descricao) {
+		private TipoPagamento(String codigoItau, String descricao) {
 			this.codigoItau = codigoItau;
 			this.descricao = descricao;
 		}
@@ -167,13 +190,13 @@ public class Pedido implements Serializable {
 			return descricao;
 		}
 
-		public static FormaPagamento getFormaPagamento(String codigoItau) {
+		public static TipoPagamento getTipoPagamento(String codigoItau) {
 			if (codigoItau == null)
 				return null;
 
-			for (FormaPagamento formaPagamento : values())
-				if (formaPagamento.getCodigoItau().equals(codigoItau))
-					return formaPagamento;
+			for (TipoPagamento tipoPagamento : values())
+				if (tipoPagamento.getCodigoItau().equals(codigoItau))
+					return tipoPagamento;
 
 			return null;
 		}

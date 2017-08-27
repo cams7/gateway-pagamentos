@@ -4,7 +4,7 @@ import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_A_VISTA;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_BOLETOS;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_CARTOES_CREDITO;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_NAO_ESCOLHIDOS;
-import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.FORMA_PAGAMENTO;
+import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.TIPO_PAGAMENTO;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.JOB_GROUP;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_A_VISTA;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_BOLETOS;
@@ -24,7 +24,7 @@ import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
-import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
+import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
 import br.com.cams7.app.model.entity.Tarefa.TarefaId;
 
 /**
@@ -46,13 +46,13 @@ public class CarregaPedidosPendentesJob extends AppJob implements Job {
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		JobDataMap data = context.getJobDetail().getJobDataMap();
-		FormaPagamento formaPagamento = (FormaPagamento) data.get(FORMA_PAGAMENTO);
+		TipoPagamento tipoPagamento = (TipoPagamento) data.get(TIPO_PAGAMENTO);
 
-		List<Long> pedidos = getPedidoRepository().buscaPedidosPendentesPelaFormaPagamento(formaPagamento);
+		List<Long> pedidos = getPedidoRepository().buscaPedidosPendentesPeloTipoPagamento(tipoPagamento);
 
 		Scheduler scheduler = context.getScheduler();
 		try {
-			switch (formaPagamento) {
+			switch (tipoPagamento) {
 			case NAO_ESCOLHIDO:
 				exibeMensagem("pagamento(s) não escolhido(s)", pedidos);
 				carregaPedidosPendentes(scheduler, PROCESSA_PAGAMENTOS_NAO_ESCOLHIDOS, PAGAMENTOS_NAO_ESCOLHIDOS,

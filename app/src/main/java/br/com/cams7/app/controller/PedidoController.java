@@ -15,7 +15,7 @@ import javax.inject.Named;
 import br.com.cams7.app.model.PedidoRepository;
 import br.com.cams7.app.model.entity.Cliente;
 import br.com.cams7.app.model.entity.Pedido;
-import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
+import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
 import br.com.cams7.app.model.entity.Pedido.SituacaoPagamento;
 
 /**
@@ -61,8 +61,8 @@ public class PedidoController extends AppController {
 		novoPedido.setDataPedido(new Date());
 	}
 
-	public FormaPagamento[] getFormaPagamento() {
-		return FormaPagamento.values();
+	public TipoPagamento[] getTipoPagamento() {
+		return TipoPagamento.values();
 	}
 
 	public SituacaoPagamento[] getSituacaoPagamento() {

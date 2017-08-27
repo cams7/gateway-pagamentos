@@ -1,9 +1,9 @@
 package br.com.cams7.app.schedule;
 
-import static br.com.cams7.app.model.entity.Pedido.FormaPagamento.A_VISTA;
-import static br.com.cams7.app.model.entity.Pedido.FormaPagamento.BOLETO;
-import static br.com.cams7.app.model.entity.Pedido.FormaPagamento.CARTAO_CREDITO;
-import static br.com.cams7.app.model.entity.Pedido.FormaPagamento.NAO_ESCOLHIDO;
+import static br.com.cams7.app.model.entity.Pedido.TipoPagamento.A_VISTA;
+import static br.com.cams7.app.model.entity.Pedido.TipoPagamento.BOLETO;
+import static br.com.cams7.app.model.entity.Pedido.TipoPagamento.CARTAO_CREDITO;
+import static br.com.cams7.app.model.entity.Pedido.TipoPagamento.NAO_ESCOLHIDO;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_A_VISTA;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_BOLETOS;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_CARTOES_CREDITO;
@@ -15,7 +15,7 @@ import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_
 import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_PAGAMENTOS_CARTOES_CREDITO;
 import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_PAGAMENTOS_NAO_ESCOLHIDOS;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosNaoVerificadosJob.PROCESSA_PEDIDOS_NAO_VERIFICADOS;
-import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.FORMA_PAGAMENTO;
+import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.TIPO_PAGAMENTO;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_A_VISTA;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_BOLETOS;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_CARTOES_CREDITO;
@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import br.com.cams7.app.model.TarefaRepository;
-import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
+import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
 import br.com.cams7.app.model.entity.Tarefa;
 import br.com.cams7.app.model.entity.Tarefa.TarefaId;
 import br.com.cams7.app.schedule.jobs.CarregaPedidosNaoVerificadosJob;
@@ -159,7 +159,7 @@ public class EscalonadorBean {
 	 * 
 	 * @param rotina
 	 *            Rotina de pagamentos
-	 * @param formaPagamento
+	 * @param tipoPagamento
 	 *            Forma de pagamento
 	 * @param carregaPagamentosKey
 	 *            Carrega pagamentos
@@ -168,10 +168,10 @@ public class EscalonadorBean {
 	 * 
 	 * @throws SchedulerException
 	 */
-	private void registraPagamentos(final TarefaId rotina, final FormaPagamento formaPagamento,
+	private void registraPagamentos(final TarefaId rotina, final TipoPagamento tipoPagamento,
 			final JobKey carregaPagamentosKey, final JobKey processaPagamentosKey) throws SchedulerException {
 
-		registraTarefa(rotina, formaPagamento, CarregaPedidosPendentesJob.class, carregaPagamentosKey,
+		registraTarefa(rotina, tipoPagamento, CarregaPedidosPendentesJob.class, carregaPagamentosKey,
 				ProcessaPedidosPendentesJob.class, processaPagamentosKey);
 	}
 
@@ -180,7 +180,7 @@ public class EscalonadorBean {
 	 * 
 	 * @param rotina
 	 *            Rotina de pagamentos
-	 * @param formaPagamento
+	 * @param tipoPagamento
 	 *            Forma de pagamento
 	 * @param carregaPagamentosType
 	 *            Job type
@@ -193,7 +193,7 @@ public class EscalonadorBean {
 	 * 
 	 * @throws SchedulerException
 	 */
-	private void registraTarefa(final TarefaId rotina, final FormaPagamento formaPagamento,
+	private void registraTarefa(final TarefaId rotina, final TipoPagamento tipoPagamento,
 			final Class<? extends Job> carregaPagamentosType, final JobKey carregaPagamentosKey,
 			final Class<? extends Job> processaPagamentosType, final JobKey processaPagamentosKey)
 			throws SchedulerException {
@@ -202,8 +202,8 @@ public class EscalonadorBean {
 		// Registra a tarefa de carregamento
 		JobDetail carregaPagamentosJob = JobBuilder.newJob(carregaPagamentosType).withIdentity(carregaPagamentosKey)
 				.build();
-		if (formaPagamento != null)
-			carregaPagamentosJob.getJobDataMap().put(FORMA_PAGAMENTO, formaPagamento);
+		if (tipoPagamento != null)
+			carregaPagamentosJob.getJobDataMap().put(TIPO_PAGAMENTO, tipoPagamento);
 
 		Trigger carregaPagamentosTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(carregaPagamentosKey))
@@ -212,8 +212,8 @@ public class EscalonadorBean {
 		// Registra a tarefa de processamento
 		JobDetail processaPagamentosJob = JobBuilder.newJob(processaPagamentosType).withIdentity(processaPagamentosKey)
 				.build();
-		if (formaPagamento != null)
-			processaPagamentosJob.getJobDataMap().put(FORMA_PAGAMENTO, formaPagamento);
+		if (tipoPagamento != null)
+			processaPagamentosJob.getJobDataMap().put(TIPO_PAGAMENTO, tipoPagamento);
 
 		Trigger processaPagamentosTrigger = TriggerBuilder.newTrigger()
 				.withIdentity(getTriggerName(processaPagamentosKey))

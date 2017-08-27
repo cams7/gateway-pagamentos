@@ -22,7 +22,7 @@ import javax.persistence.criteria.Subquery;
 
 import br.com.cams7.app.model.entity.Cliente;
 import br.com.cams7.app.model.entity.Pedido;
-import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
+import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
 import br.com.cams7.app.model.entity.Pedido.SituacaoPagamento;
 
 /**
@@ -79,7 +79,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 		Root<Pedido> sqFrom = sq.from(Pedido.class);
 
 		sq.select(cb.min(sqFrom.<Long>get("id")));
-		sq.where(cb.and(cb.isNull(sqFrom.<FormaPagamento>get("formaPagamento")),
+		sq.where(cb.and(cb.isNull(sqFrom.<TipoPagamento>get("tipoPagamento")),
 				cb.isNull(sqFrom.<SituacaoPagamento>get("situacaoPagamento"))));
 
 		cq.select(cqFrom);
@@ -96,7 +96,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 	}
 
 	@Override
-	public Pedido buscaPrimeiroPedidoPendente(FormaPagamento formaPagamento) {
+	public Pedido buscaPrimeiroPedidoPendente(TipoPagamento tipoPagamento) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Pedido> cq = cb.createQuery(Pedido.class);
 
@@ -106,7 +106,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 		Root<Pedido> sqFrom = sq.from(Pedido.class);
 
 		sq.select(cb.min(sqFrom.<Long>get("id")));
-		sq.where(cb.and(cb.equal(sqFrom.<FormaPagamento>get("formaPagamento"), formaPagamento),
+		sq.where(cb.and(cb.equal(sqFrom.<TipoPagamento>get("tipoPagamento"), tipoPagamento),
 				cb.or(cb.equal(sqFrom.<SituacaoPagamento>get("situacaoPagamento"), NAO_FINALIZADO),
 						cb.equal(sqFrom.<SituacaoPagamento>get("situacaoPagamento"), ERRO_PROCESSAMENTO))));
 
@@ -133,7 +133,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 
 		cq.select(from.<Long>get("id")).distinct(true);
 
-		cq.where(cb.and(cb.isNull(from.<FormaPagamento>get("formaPagamento")),
+		cq.where(cb.and(cb.isNull(from.<TipoPagamento>get("tipoPagamento")),
 				cb.isNull(from.<SituacaoPagamento>get("situacaoPagamento"))));
 
 		cq.orderBy(cb.asc(from.<Long>get("id")));
@@ -145,7 +145,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 	}
 
 	@Override
-	public List<Long> buscaPedidosPendentesPelaFormaPagamento(FormaPagamento formaPagamento) {
+	public List<Long> buscaPedidosPendentesPeloTipoPagamento(TipoPagamento tipoPagamento) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
 
@@ -153,7 +153,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 
 		cq.select(from.<Long>get("id")).distinct(true);
 
-		cq.where(cb.and(cb.equal(from.<FormaPagamento>get("formaPagamento"), formaPagamento),
+		cq.where(cb.and(cb.equal(from.<TipoPagamento>get("tipoPagamento"), tipoPagamento),
 				cb.or(cb.equal(from.<SituacaoPagamento>get("situacaoPagamento"), NAO_FINALIZADO),
 						cb.equal(from.<SituacaoPagamento>get("situacaoPagamento"), ERRO_PROCESSAMENTO))));
 

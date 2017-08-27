@@ -1,6 +1,7 @@
 package br.com.cams7.app.schedule.jobs;
 
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PEDIDOS_NAO_VERIFICADOS;
+import static br.com.cams7.app.schedule.jobs.CarregaPedidosNaoVerificadosJob.CARREGA_PEDIDOS_NAO_VERIFICADOS;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -49,6 +50,7 @@ public class ProcessaPedidosNaoVerificadosJob extends AppJob implements Job {
 	private void processaPedidosNaoVerificados(Scheduler scheduler, List<Long> pedidos) throws SchedulerException {
 		boolean empty = isEmpty(pedidos);
 
+		pauseOrRestartJob(scheduler, CARREGA_PEDIDOS_NAO_VERIFICADOS, !empty);
 		pauseOrRestartJob(scheduler, PROCESSA_PEDIDOS_NAO_VERIFICADOS, empty);
 
 		if (!empty) {

@@ -6,7 +6,7 @@ package br.com.cams7.app.model;
 import java.util.List;
 
 import br.com.cams7.app.model.entity.Pedido;
-import br.com.cams7.app.model.entity.Pedido.FormaPagamento;
+import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
 
 /**
  * @author cesaram
@@ -19,7 +19,7 @@ public interface PedidoRepository {
 
 	Pedido buscaPrimeiroPedidoNaoVerificado();
 
-	Pedido buscaPrimeiroPedidoPendente(FormaPagamento formaPagamento);
+	Pedido buscaPrimeiroPedidoPendente(TipoPagamento tipoPagamento);
 
 	void cadastra(Pedido pedido);
 
@@ -27,5 +27,5 @@ public interface PedidoRepository {
 
 	List<Long> buscaPedidosNaoVerificados();
 
-	List<Long> buscaPedidosPendentesPelaFormaPagamento(FormaPagamento formaPagamento);
+	List<Long> buscaPedidosPendentesPeloTipoPagamento(TipoPagamento tipoPagamento);
 }

@@ -18,11 +18,11 @@ update cliente_seq set next_val = 3 where next_val=2;
 -- 0 0 12 ? * WED A tarefa será executada todas às quartas-feiras às 12:00pm
 -- 0 0 8,12 * * * A tarefa será executada todos os dias, às 08:00am e 12:00pm
 
-insert into tarefa (tarefa_id, carrega_cron, processa_cron) values(0, '0/30 * * * * ?', '0/11 * * * * ?');
-insert into tarefa (tarefa_id, carrega_cron, processa_cron) values(1, '12 0/1 * * * ?', '0/13 * * * * ?');
-insert into tarefa (tarefa_id, carrega_cron, processa_cron) values(2, '24 0/2 * * * ?', '0/25 * * * * ?');
-insert into tarefa (tarefa_id, carrega_cron, processa_cron) values(3, '36 0/3 * * * ?', '0/37 * * * * ?');
-insert into tarefa (tarefa_id, carrega_cron, processa_cron) values(4, '48 0/4 * * * ?', '0/49 * * * * ?');
+insert into tarefa (tarefa_id, carrega_cron, processa_cron) values(0, '0/35 * * * * ?', '0/5 * * * * ?');
+insert into tarefa (tarefa_id, carrega_cron, processa_cron) values(1, '10 0/1 * * * ?', '0/10 * * * * ?');
+insert into tarefa (tarefa_id, carrega_cron, processa_cron) values(2, '20 0/2 * * * ?', '0/20 * * * * ?');
+insert into tarefa (tarefa_id, carrega_cron, processa_cron) values(3, '30 0/3 * * * ?', '0/30 * * * * ?');
+insert into tarefa (tarefa_id, carrega_cron, processa_cron) values(4, '40 0/4 * * * ?', '0/40 * * * * ?');
 
 --insert into cliente (cliente_id, cliente_nome) values (cliente_seq.nextval, 'Maria Oliveira Silva');
 --insert into cliente (cliente_id, cliente_nome) values (cliente_seq.nextval, 'Carlos Silva Freitas');
