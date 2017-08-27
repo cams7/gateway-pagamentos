@@ -258,10 +258,10 @@ public abstract class AppJob {
 	}
 
 	protected void showJobLog(JobExecutionContext context) throws SchedulerException {
-		LOG.log(Level.INFO, "Trigger: {0}, Fired at: {1}, Instance: {2}",
-				new Object[] { context.getTrigger().getKey(),
-						new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(context.getFireTime()),
-						context.getScheduler().getSchedulerInstanceId() });
+//		LOG.log(Level.INFO, "Trigger: {0}, Fired at: {1}, Instance: {2}",
+//				new Object[] { context.getTrigger().getKey(),
+//						new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(context.getFireTime()),
+//						context.getScheduler().getSchedulerInstanceId() });
 	}
 
 	protected static String getCarregaName(TarefaId rotina) {
