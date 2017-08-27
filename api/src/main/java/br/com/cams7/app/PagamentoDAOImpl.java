@@ -87,6 +87,46 @@ public class PagamentoDAOImpl implements PagamentoDAO {
 	}
 
 	@Override
+	public String buscaTipoPagamentoPeloPedido(String numeroPedido) {
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+
+			PreparedStatement ps = null;
+			try {
+				ps = conn.prepareStatement("select p.TIP_PAG from PEDIDO p where p.COD_PEDIDO = ?");
+				ps.setString(1, numeroPedido);
+
+				ResultSet rs = ps.executeQuery();
+
+				String tipoPagamento = null;
+
+				if (rs.next())
+					tipoPagamento = rs.getString(1);
+
+				if (rs.next())
+					throw new AppException(
+							String.format("Existe mais de um pagamento para o pedido (%s).", numeroPedido));
+
+				return tipoPagamento;
+			} finally {
+				if (ps != null)
+					ps.close();
+			}
+		} catch (SQLException e) {
+			throw new AppException(e);
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				throw new AppException(e);
+			}
+		}
+
+	}
+
+	@Override
 	public boolean existePagamento(String numeroPedido) {
 		Connection conn = null;
 		try {
@@ -97,6 +137,42 @@ public class PagamentoDAOImpl implements PagamentoDAO {
 
 				ps = conn.prepareStatement("select count(p.COD_PEDIDO) from PEDIDO p where p.COD_PEDIDO = ?");
 				ps.setString(1, numeroPedido);
+
+				ResultSet rs = ps.executeQuery();
+
+				if (rs.next())
+					return rs.getInt(1) > 0;
+			} finally {
+				if (ps != null)
+					ps.close();
+			}
+		} catch (SQLException e) {
+			throw new AppException(e);
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				throw new AppException(e);
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean seraProcessadoNovamente(String numeroPedido) {
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+
+			PreparedStatement ps = null;
+			try {
+
+				ps = conn.prepareStatement(
+						"select count(p.COD_PEDIDO) from PEDIDO p where p.COD_PEDIDO = ? and (p.SIT_PAG = ? or p.SIT_PAG = ?)");
+				ps.setString(1, numeroPedido);
+				ps.setString(2, "01");
+				ps.setString(3, "02");
 
 				ResultSet rs = ps.executeQuery();
 
@@ -156,6 +232,41 @@ public class PagamentoDAOImpl implements PagamentoDAO {
 				throw new AppException(e);
 			}
 		}
+	}
+
+	@Override
+	public void atualiza(String numeroPedido, String situacaoPagamento) {
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+
+			PreparedStatement ps = null;
+			try {
+
+				ps = conn.prepareStatement("update PEDIDO set SIT_PAG=? where COD_PEDIDO=?");
+
+				ps.setString(1, situacaoPagamento);
+				ps.setString(2, numeroPedido);
+
+				// execute insert SQL stetement
+				ps.executeUpdate();
+
+				System.out.println("O pagamento foi atualizado com sucesso.");
+			} finally {
+				if (ps != null)
+					ps.close();
+			}
+		} catch (SQLException e) {
+			throw new AppException(e);
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				throw new AppException(e);
+			}
+		}
+
 	}
 
 }

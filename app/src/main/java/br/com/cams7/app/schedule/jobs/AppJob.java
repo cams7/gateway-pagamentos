@@ -68,25 +68,29 @@ public abstract class AppJob {
 
 		String codigoEmpresa = "J0000560680005480000000013";
 
-		Document document = getRespostaItau(codigoEmpresa, pedido.getId());
-		List<Pagamento> pagamentos = getPagamentos(document);
+		try {
+			Document document = getRespostaItau(codigoEmpresa, pedido.getId());
+			List<Pagamento> pagamentos = getPagamentos(document);
 
-		for (Pagamento pagamento : pagamentos) {
-			if (!pagamento.getNumeroPedido().equals(pedido.getId()))
-				throw new AppException(String.format(
-						"O número do pedido (%s), retornado pelo Banco Itaú, não é o mesmo número (%s) que está cadastrado na base de dados",
-						pagamento.getNumeroPedido(), pedido.getId()));
+			for (Pagamento pagamento : pagamentos) {
+				if (!pagamento.getNumeroPedido().equals(pedido.getId()))
+					throw new AppException(String.format(
+							"O número do pedido (%s), retornado pelo Banco Itaú, não é o mesmo número (%s) que está cadastrado na base de dados",
+							pagamento.getNumeroPedido(), pedido.getId()));
 
-			pedido.setValorPago(pagamento.getValorPagamento());
-			pedido.setTipoPagamento(pagamento.getTipoPagamento());
-			pedido.setSituacaoPagamento(pagamento.getSituacaoPagamento());
-			pedido.setDataPagamento(pagamento.getDataPagamento());
+				pedido.setValorPago(pagamento.getValorPagamento());
+				pedido.setTipoPagamento(pagamento.getTipoPagamento());
+				pedido.setSituacaoPagamento(pagamento.getSituacaoPagamento());
+				pedido.setDataPagamento(pagamento.getDataPagamento());
 
-			getPedidoRepository().atualiza(pedido);
+				getPedidoRepository().atualiza(pedido);
+			}
+
+			if (!pagamentos.isEmpty())
+				LOG.log(Level.INFO, "O pedido ({0}) foi processado...", new Object[] { pedido.getId() });
+		} catch (AppException e) {
+			LOG.log(Level.WARNING, "Pedido ({0}): {1}", new Object[] { pedido.getId(), e.getMessage() });
 		}
-
-		if (!pagamentos.isEmpty())
-			LOG.log(Level.INFO, "O pedido ({0}) foi processado...", new Object[] { pedido.getId() });
 
 	}
 
@@ -105,25 +109,11 @@ public abstract class AppJob {
 
 				NodeList params = eParameter.getElementsByTagName("PARAM");
 
+				verificaErro(params);
+
 				Pagamento pagamento = new Pagamento();
 
-				int length = params.getLength();
-
-				if (length == 1) {
-					Node param = params.item(0);
-
-					if (param.getNodeType() == Node.ELEMENT_NODE) {
-						Element eParam = (Element) param;
-
-						final String ID = eParam.getAttribute("ID").toUpperCase();
-						final String VALUE = eParam.getAttribute("VALUE");
-
-						if (ID.equals("ERRO"))
-							throw new AppException(VALUE);
-					}
-				}
-
-				for (int j = 0; j < length; j++) {
+				for (int j = 0; j < params.getLength(); j++) {
 					Node param = params.item(j);
 
 					if (param.getNodeType() == Node.ELEMENT_NODE) {
@@ -154,12 +144,28 @@ public abstract class AppJob {
 		return pagamentos;
 	}
 
+	private void verificaErro(NodeList params) {
+		if (params.getLength() == 1) {
+			Node param = params.item(0);
+
+			if (param.getNodeType() == Node.ELEMENT_NODE) {
+				Element eParam = (Element) param;
+
+				final String ID = eParam.getAttribute("ID").toUpperCase();
+				final String VALUE = eParam.getAttribute("VALUE");
+
+				if (ID.equals("ERRO"))
+					throw new AppException(VALUE);
+			}
+		}
+	}
+
 	private Object getParamValue(final Class<?> fieldType, final String value) {
 		if (Long.class.equals(fieldType))
 			return Long.valueOf(value);
 
 		if (Double.class.equals(fieldType))
-			return Double.valueOf(value.replaceFirst(",", "."));
+			return Double.valueOf(converteValor(value));
 
 		if (TipoPagamento.class.equals(fieldType))
 			return TipoPagamento.getTipoPagamento(value);
@@ -182,6 +188,10 @@ public abstract class AppJob {
 		}
 
 		return value;
+	}
+
+	private String converteValor(final String value) {
+		return value.replaceFirst(",", ".");
 	}
 
 	private Document getRespostaItau(String codigoEmpresa, Long codigoPedido) {

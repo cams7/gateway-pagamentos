@@ -113,14 +113,27 @@ public class ShoplineServlet extends HttpServlet {
 		out.println("</TABLE>");
 		out.println("</DIV>");
 		out.println("<DIV>");
-		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_PAGAMENTO_NAO_ESCOLHIDO + "\">");
-		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_PAGAMENTO_A_VISTA + "\">");
-		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_PAGAMETO_BOLETO + "\">");
-		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_PAGAMENTO_CARTAO_CREDITO + "\">");
+
+		PagamentoDAO pagamentoDAO = new PagamentoDAOImpl();
+		String tipoPagamento = pagamentoDAO.buscaTipoPagamentoPeloPedido(numeroPedido);
+
+		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_PAGAMENTO_NAO_ESCOLHIDO + "\" "
+				+ disabledField(tipoPagamento, "00") + ">");
+		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_PAGAMENTO_A_VISTA + "\" "
+				+ disabledField(tipoPagamento, "01") + ">");
+		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_PAGAMETO_BOLETO + "\" "
+				+ disabledField(tipoPagamento, "02") + ">");
+		out.println("<INPUT TYPE=\"submit\" name=\"action\" value=\"" + BUTTON_PAGAMENTO_CARTAO_CREDITO + "\" "
+				+ disabledField(tipoPagamento, "03") + ">");
+
 		out.println("</DIV>");
 		out.println("</FORM>");
 		out.println("</body>");
 		out.println("</html>");
+	}
+
+	private String disabledField(String tipoPagamento, String codigo) {
+		return tipoPagamento == null || codigo.equals(tipoPagamento) ? "" : "disabled";
 	}
 
 	private String getParam(String param, final String DC, int i) {
@@ -136,53 +149,47 @@ public class ShoplineServlet extends HttpServlet {
 	}
 
 	private void processaPagamentoNaoEscolhido(Pagamento pagamento) {
-		String[] situacoes = new String[] { "01", "02", "03" };
-
 		pagamento.setTipoPagamento("00");
-		pagamento.setSituacaoPagamento(situacoes[new Random().nextInt(situacoes.length - 1)]);
-
-		incluiPagamento(pagamento);
+		incluiPagamento(pagamento, new String[] { "01", "02", "03" }, new String[] { "03" });
 	}
 
 	private void processaPagamentoAVista(Pagamento pagamento) {
-		String[] situacoes = new String[] { "00", "01", "02", "03" };
-
 		pagamento.setTipoPagamento("01");
-		pagamento.setSituacaoPagamento(situacoes[new Random().nextInt(situacoes.length - 1)]);
-
-		incluiPagamento(pagamento);
-	}
-
-	private void processaPagamentoBoleto(Pagamento pagamento) {
-		String[] situacoes = new String[] { "00", "01", "02", "03", "04", "05", "06" };
-
-		pagamento.setTipoPagamento("02");
-		pagamento.setSituacaoPagamento(situacoes[new Random().nextInt(situacoes.length - 1)]);
-
-		incluiPagamento(pagamento);
-
+		incluiPagamento(pagamento, new String[] { "00", "01", "02", "03" }, new String[] { "00", "03" });
 	}
 
 	private void processaPagamentoCartaoCredito(Pagamento pagamento) {
-		String[] situacoes = new String[] { "00", "01", "02", "03" };
-
 		pagamento.setTipoPagamento("03");
-		pagamento.setSituacaoPagamento(situacoes[new Random().nextInt(situacoes.length - 1)]);
-
-		incluiPagamento(pagamento);
+		incluiPagamento(pagamento, new String[] { "00", "01", "02", "03" }, new String[] { "00", "03" });
 	}
 
-	private void incluiPagamento(Pagamento pagamento) {
+	private void processaPagamentoBoleto(Pagamento pagamento) {
+		pagamento.setTipoPagamento("02");
+		incluiPagamento(pagamento, new String[] { "00", "01", "02", "03", "04", "05", "06" },
+				new String[] { "00", "03", "04", "05", "06" });
+
+	}
+
+	private void incluiPagamento(Pagamento pagamento, String[] situacoesInclusao, String[] situacoesAlteracao) {
 		try {
 			PagamentoDAO pagamentoDAO = new PagamentoDAOImpl();
 
-			if (!pagamentoDAO.existePagamento(pagamento.getNumeroPedido()))
+			if (!pagamentoDAO.existePagamento(pagamento.getNumeroPedido())) {
+				pagamento.setSituacaoPagamento(getSituacaoPagamento(situacoesInclusao));
 				pagamentoDAO.cadastra(pagamento);
-			else
-				System.out.println("O pagamento já foi cadastrado anteriormente");
+			} else if (pagamentoDAO.seraProcessadoNovamente(pagamento.getNumeroPedido())) {
+				pagamento.setSituacaoPagamento(getSituacaoPagamento(situacoesAlteracao));
+				pagamentoDAO.atualiza(pagamento.getNumeroPedido(), pagamento.getSituacaoPagamento());
+			} else
+				System.err.println("O pagamento já foi cadastrado anteriormente");
 		} catch (AppException e) {
 			System.err.println(e);
 		}
+	}
+
+	private String getSituacaoPagamento(String[] situacoes) {
+		int index = situacoes.length > 1 ? new Random().nextInt(situacoes.length - 1) : 0;
+		return situacoes[index];
 	}
 
 }
