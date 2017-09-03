@@ -17,6 +17,20 @@
 	<dependencies>
 		<dependency>
 			<groupId>br.com.cams7</groupId>
+			<artifactId>gateway-pagamentos-commons</artifactId>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>br.com.cams7</groupId>
+			<artifactId>gateway-pagamentos-app-model</artifactId>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>br.com.cams7</groupId>
 			<artifactId>gateway-pagamentos-app-ejb</artifactId>
 			<type>ejb</type>
 			<scope>provided</scope>

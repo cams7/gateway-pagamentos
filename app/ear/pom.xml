@@ -16,6 +16,18 @@
     <description>Módulo EAR da aplicação Gateway de pagamentos</description>
 
     <dependencies>
+		<dependency>
+			<groupId>br.com.cams7</groupId>
+			<artifactId>gateway-pagamentos-commons</artifactId>
+			<type>jar</type>
+		</dependency>
+		
+		<dependency>
+			<groupId>br.com.cams7</groupId>
+			<artifactId>gateway-pagamentos-app-model</artifactId>
+			<type>jar</type>
+		</dependency>
+		
         <dependency>
 			<groupId>br.com.cams7</groupId>
 			<artifactId>gateway-pagamentos-app-ejb</artifactId>
@@ -41,6 +53,16 @@
                     <version>6</version>
                     <defaultLibBundleDir>lib</defaultLibBundleDir>
                     <modules>
+						<jarModule>
+							<groupId>br.com.cams7</groupId>
+							<artifactId>gateway-pagamentos-app-model</artifactId>
+							<bundleDir>/</bundleDir>
+							<includeInApplicationXml>true</includeInApplicationXml>
+						</jarModule>
+						<ejbModule>
+							<groupId>br.com.cams7</groupId>
+							<artifactId>gateway-pagamentos-app-ejb</artifactId>
+						</ejbModule>
                         <webModule>
                             <groupId>br.com.cams7</groupId>
                             <artifactId>gateway-pagamentos-app-war</artifactId>

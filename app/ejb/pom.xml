@@ -15,6 +15,20 @@
     <description>Módulo EJB da aplicação Gateway de pagamentos</description>
    
     <dependencies>
+		<dependency>
+			<groupId>br.com.cams7</groupId>
+			<artifactId>gateway-pagamentos-commons</artifactId>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>br.com.cams7</groupId>
+			<artifactId>gateway-pagamentos-app-model</artifactId>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
+		
         <!-- Import the CDI API, we use provided scope as the API is included in JBoss WildFly -->
         <dependency>
             <groupId>javax.enterprise</groupId>
