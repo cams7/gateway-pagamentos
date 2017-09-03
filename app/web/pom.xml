@@ -45,11 +45,11 @@
 		
 		<!-- Import the Common Annotations API (JSR-250), we use provided scope
             as the API is included in JBoss WildFly -->
-        <dependency>
+        <!--dependency>
             <groupId>org.jboss.spec.javax.annotation</groupId>
             <artifactId>jboss-annotations-api_1.2_spec</artifactId>
             <scope>provided</scope>
-        </dependency>
+        </dependency-->
 		
 		<!-- Import the EJB API, we use provided scope as the API is included in
               JBoss WildFly -->
@@ -66,34 +66,6 @@
             <scope>provided</scope>
         </dependency>
         
-		<dependency>
-			<groupId>org.hibernate.javax.persistence</groupId>
-			<artifactId>hibernate-jpa-2.1-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>com.enigmabridge</groupId>
-			<artifactId>hibernate4-sqlite-dialect</artifactId>
-			<version>0.1.2</version>
-		</dependency>
-
 		<!-- Quartz -->
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
