@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -10,31 +11,59 @@
 	<name>Gateway de pagamentos</name>
 	<description>Gateway de pagamentos</description>
 
-	<url>https://github.com/cams7/gateway-pagamentos/tree/master</url>
-	<scm>
-		<connection>scm:git:https://github.com/cams7/gateway-pagamentos.git</connection>
-	</scm>
-
 	<properties>
 		<user.name>César A. Magalhães</user.name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
-		
+
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<maven.compiler.source>1.7</maven.compiler.source>
-		
+
 		<version.compiler.plugin>2.3.2</version.compiler.plugin>
 		<version.jar.plugin>2.6</version.jar.plugin>
 		<version.war.plugin>2.1.1</version.war.plugin>
-		<version.dependency.plugin>2.1</version.dependency.plugin>		
+		<version.dependency.plugin>2.1</version.dependency.plugin>
+
+		<databases.path>/Desenv/Github/emp1/gateway-pagamentos/db</databases.path>
 	</properties>
+
+	<url>https://github.com/cams7/gateway-pagamentos/tree/master</url>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<distribution>repo</distribution>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:https://github.com/cams7/gateway-pagamentos.git</connection>
+	</scm>
 
 	<modules>
 		<module>app</module>
 		<module>api</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<!--version>4.4.6</version -->
+				<version>4.2.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<!--version>4.5.3</version -->
+				<version>4.2.1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<resources>
@@ -43,7 +72,7 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		
+
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -119,7 +148,7 @@
 							</manifestEntries>
 						</archive>
 					</configuration>
-				</plugin>		
+				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -178,6 +207,18 @@
 		</plugins>
 	</build>
 
-	<profiles>		
+	<profiles>
+		<profile>
+			<id>unix</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>Linux</name>
+				</os>
+			</activation>
+			<properties>
+				<databases.path>/home/vagrant/github/gateway-pagamentos/db</databases.path>
+			</properties>
+		</profile>
 	</profiles>
 </project>

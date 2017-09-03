@@ -1,7 +1,8 @@
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	
 	<parent>
 		<groupId>br.com.cams7</groupId>
 		<artifactId>gateway-pagamentos</artifactId>
@@ -11,20 +12,19 @@
 	<artifactId>gateway-pagamentos-api</artifactId>
 	<packaging>war</packaging>
 
-	<name>API de Gateway de pagamentos</name>
+	<name>API do Gateway de pagamentos</name>
+	<description>API do Gateway de pagamentos</description>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<app.database>app</app.database>
+		<api.database>api</api.database>
 
 		<!-- db.driverClassName>org.h2.Driver</db.driverClassName>
-		<db.connection.url>jdbc:h2:file:/Desenv/Github/emp1/gateway-pagamentos/api/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</db.connection.url>
+		<db.connection.url>jdbc:h2:file:${databases.path}/${api.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</db.connection.url>
 		<db.username>sa</db.username>
 		<db.password>sa</db.password-->
 
 		<db.driverClassName>org.sqlite.JDBC</db.driverClassName>
-		<db.connection.url>jdbc:sqlite:/Desenv/Github/emp1/gateway-pagamentos/api/db/${app.database}.sqlite</db.connection.url>
+		<db.connection.url>jdbc:sqlite:${databases.path}/${api.database}.sqlite</db.connection.url>
 		<db.username></db.username>
 		<db.password></db.password>
 	</properties>
@@ -58,21 +58,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
-
-	<profiles>
-		<profile>
-			<id>unix</id>
-			<activation>
-				<os>
-					<family>unix</family>
-					<name>Linux</name>
-				</os>
-			</activation>
-			<properties>
-				<!-- db.connection.url>jdbc:h2:file:/home/vagrant/github/gateway-pagamentos/api/db/${app.database}.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</db.connection.url-->
-				<db.connection.url>jdbc:sqlite:/home/vagrant/github/gateway-pagamentos/api/db/${app.database}.sqlite</db.connection.url>
-			</properties>
-		</profile>
-	</profiles>
+	</build>	
 </project>

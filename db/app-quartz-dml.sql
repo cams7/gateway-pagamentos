@@ -1,3 +1,5 @@
+--DML - Data Manipulation Language (Linguagem de Manipulação de Dados)
+
 select * from QRTZ_JOB_DETAILS;
 select * from QRTZ_TRIGGERS;
 select * from QRTZ_SIMPLE_TRIGGERS;

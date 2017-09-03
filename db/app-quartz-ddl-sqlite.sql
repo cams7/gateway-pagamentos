@@ -1,3 +1,5 @@
+--DDL - Data Definition Language (Linguagem de Definição de Dados)
+
 -- In your Quartz properties file, you'll need to set 
 -- org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.StdJDBCDelegate
 
