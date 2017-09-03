@@ -92,8 +92,7 @@
 		</div>
 
 		<div id="shopline" style="visibility: hidden; display: inline;">
-			<FORM METHOD="POST"
-				ACTION="http://localhost:8090/gateway-pagamentos-api/shopline"
+			<FORM METHOD="POST" ACTION="${pedidoController.urlShopline}"
 				onsubmit="carregabrw()" target="SHOPLINE">
 				<INPUT TYPE="hidden" NAME="DC" VALUE="" />
 			</FORM>

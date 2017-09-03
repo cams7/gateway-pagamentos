@@ -47,7 +47,7 @@
 		<app.persistence.jta.data.source>java:jboss/datasources/SQLiteDS</app.persistence.jta.data.source>
 		<app.persistence.hibernate.dialect>com.enigmabridge.hibernate.dialect.SQLiteDialect</app.persistence.hibernate.dialect>
 		<app.persistence.hibernate.hbm2ddl.auto>create-drop</app.persistence.hibernate.hbm2ddl.auto>
-		<app.persistence.hibernate.show_sql>false</app.persistence.hibernate.show_sql>
+		<app.persistence.hibernate.show_sql>false</app.persistence.hibernate.show_sql>		
 	</properties>
 
 	<modules>

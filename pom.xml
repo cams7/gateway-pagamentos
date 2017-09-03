@@ -27,7 +27,11 @@
 		<version.dependency.plugin>2.1</version.dependency.plugin>
 
 		<databases.path>/Desenv/Github/emp1/gateway-pagamentos/db</databases.path>
-		<org.apache.httpcomponents.scope>provided</org.apache.httpcomponents.scope>
+		
+		<api.url.consulta>http://localhost:8090/gateway-pagamentos-api/consulta</api.url.consulta>
+		<api.url.shopline>http://localhost:8090/gateway-pagamentos-api/shopline</api.url.shopline>
+		<api.codigo.empresa>J0000560680005480000000013</api.codigo.empresa>
+		<api.chave.criptografia>A1B2C3D4E5F6G7H8</api.chave.criptografia>
 	</properties>
 
 	<url>https://github.com/cams7/gateway-pagamentos/tree/master</url>
@@ -227,6 +231,9 @@
 			</activation>
 			<properties>
 				<databases.path>/home/vagrant/github/gateway-pagamentos/db</databases.path>
+				
+				<api.url.consulta>http://localhost:8185/gateway-pagamentos-api/consulta</api.url.consulta>
+				<api.url.shopline>http://localhost:8185/gateway-pagamentos-api/shopline</api.url.shopline>
 			</properties>
 		</profile>
 	</profiles>

@@ -4,7 +4,6 @@
 package br.com.cams7.app.schedule.jobs;
 
 import static br.com.cams7.app.itau.ApiShopline.getPagamentos;
-import static br.com.cams7.app.itau.ApiShopline.getRespostaItau;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -19,7 +18,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.Trigger.TriggerState;
-import org.w3c.dom.Document;
 
 import br.com.cams7.app.beans.PedidosEncontradosBean;
 import br.com.cams7.app.itau.Pagamento;
@@ -44,12 +42,8 @@ public abstract class AppJob {
 
 	protected void processaPedido(Pedido pedido) {
 
-		String codigoEmpresa = "J0000560680005480000000013";
-
 		try {
-			Document document = getRespostaItau("http://localhost:8090/gateway-pagamentos-api/consulta", codigoEmpresa,
-					pedido.getId());
-			List<Pagamento> pagamentos = getPagamentos(document);
+			List<Pagamento> pagamentos = getPagamentos(pedido.getId());
 
 			for (Pagamento pagamento : pagamentos) {
 				if (!pagamento.getNumeroPedido().equals(pedido.getId()))

@@ -29,6 +29,7 @@ import org.xml.sax.SAXException;
 
 import br.com.cams7.app.itau.Pagamento.SituacaoPagamento;
 import br.com.cams7.app.itau.Pagamento.TipoPagamento;
+import br.com.cams7.app.util.AppConfig;
 import br.com.cams7.app.util.AppException;
 
 /**
@@ -39,45 +40,12 @@ public class ApiShopline {
 
 	public static final int HTTP_OK = 200;
 
-	public static Document getRespostaItau(final String url, final String codigoEmpresa, final Long codigoPedido) {
-		final String USER_AGENT = "Mozilla/5.0";
-
-		HttpClient client = new DefaultHttpClient();
-		HttpPost request = new HttpPost(url);
-
-		// add header
-		request.setHeader("User-Agent", USER_AGENT);
-
-		// Formato: Formato do retorno da consulta
-		// Numérico com 01 posição:
-		// 0 para formato de página HTML para consulta visual
-		// 1 para formato XML
-		final String FORMATO = "1";
-
-		List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
-		urlParameters.add(new BasicNameValuePair("DC",
-				String.format("%s;%s;%s", codigoPedido, codigoEmpresa.toUpperCase(), FORMATO)));
-
-		try {
-			request.setEntity(new UrlEncodedFormEntity(urlParameters));
-
-			HttpResponse response = client.execute(request);
-
-			int statusCode = response.getStatusLine().getStatusCode();
-			if (statusCode != HTTP_OK)
-				throw new AppException(String.format("O código de estado HTTP (%s) é inválido", statusCode));
-
-			InputStream content = response.getEntity().getContent();
-
-			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(content);
-			return document;
-
-		} catch (IOException | SAXException | ParserConfigurationException e) {
-			throw new AppException(e);
-		}
+	public static List<Pagamento> getPagamentos(final Long codigoPedido) {
+		Document document = getRespostaItau(codigoPedido);
+		return getPagamentos(document);
 	}
 
-	public static List<Pagamento> getPagamentos(Document document) {
+	private static List<Pagamento> getPagamentos(Document document) {
 		Element eConsulta = document.getDocumentElement();
 
 		NodeList parameters = eConsulta.getElementsByTagName("PARAMETER");
@@ -175,6 +143,48 @@ public class ApiShopline {
 
 	private static String converteValor(final String value) {
 		return value.replaceFirst(",", ".");
+	}
+
+	private static Document getRespostaItau(final Long codigoPedido) {
+		final String CODIGO_EMPRESA = AppConfig.getProperty("API_CODIGO_EMPRESA");
+		final String URL_CONSULTA = AppConfig.getProperty("API_URL_CONSULTA");
+		final String CHAVE_CRIPTOGRAFIA = AppConfig.getProperty("API_CHAVE_CRIPTOGRAFIA");
+
+		final String USER_AGENT = "Mozilla/5.0";
+
+		HttpClient client = new DefaultHttpClient();
+		HttpPost request = new HttpPost(URL_CONSULTA);
+
+		// add header
+		request.setHeader("User-Agent", USER_AGENT);
+
+		// Formato: Formato do retorno da consulta
+		// Numérico com 01 posição:
+		// 0 para formato de página HTML para consulta visual
+		// 1 para formato XML
+		final String FORMATO = "1";
+
+		List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
+		urlParameters.add(new BasicNameValuePair("DC",
+				String.format("%s;%s;%s", codigoPedido, CODIGO_EMPRESA.toUpperCase(), FORMATO)));
+
+		try {
+			request.setEntity(new UrlEncodedFormEntity(urlParameters));
+
+			HttpResponse response = client.execute(request);
+
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode != HTTP_OK)
+				throw new AppException(String.format("O código de estado HTTP (%s) é inválido", statusCode));
+
+			InputStream content = response.getEntity().getContent();
+
+			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(content);
+			return document;
+
+		} catch (IOException | SAXException | ParserConfigurationException e) {
+			throw new AppException(e);
+		}
 	}
 
 }

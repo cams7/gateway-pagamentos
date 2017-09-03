@@ -17,6 +17,7 @@ import br.com.cams7.app.itau.Pagamento.TipoPagamento;
 import br.com.cams7.app.model.PedidoRepository;
 import br.com.cams7.app.model.entity.Cliente;
 import br.com.cams7.app.model.entity.Pedido;
+import br.com.cams7.app.util.AppConfig;
 
 /**
  * @author cesaram
@@ -25,6 +26,8 @@ import br.com.cams7.app.model.entity.Pedido;
 @SuppressWarnings("serial")
 @Model
 public class PedidoController extends AppController {
+
+	private String urlShopline;
 
 	@EJB
 	private PedidoRepository pedidoRepository;
@@ -58,6 +61,8 @@ public class PedidoController extends AppController {
 	public void inicializaNovoPedido() {
 		novoPedido = new Pedido();
 		novoPedido.setDataPedido(new Date());
+
+		urlShopline = AppConfig.getProperty("API_URL_SHOPLINE");
 	}
 
 	public TipoPagamento[] getTipoPagamento() {
@@ -74,6 +79,10 @@ public class PedidoController extends AppController {
 
 	public void setClienteId(Long clienteId) {
 		this.clienteId = clienteId;
+	}
+
+	public String getUrlShopline() {
+		return urlShopline;
 	}
 
 }
