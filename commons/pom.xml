@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-	
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>br.com.cams7</groupId>
 		<artifactId>gateway-pagamentos</artifactId>
@@ -14,8 +14,20 @@
 
 	<name>Gateway de pagamentos - COMMONS</name>
 	<description>Biblioteca comum a todos os módulos</description>
-	
-    <dependencies>        
-    </dependencies>    
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<!--version>4.4.6</version -->
+			<scope>${org.apache.httpcomponents.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<!--version>4.5.3</version -->
+			<scope>${org.apache.httpcomponents.scope}</scope>
+		</dependency>
+	</dependencies>
 </project>
 

@@ -27,6 +27,7 @@
 		<version.dependency.plugin>2.1</version.dependency.plugin>
 
 		<databases.path>/Desenv/Github/emp1/gateway-pagamentos/db</databases.path>
+		<org.apache.httpcomponents.scope>provided</org.apache.httpcomponents.scope>
 	</properties>
 
 	<url>https://github.com/cams7/gateway-pagamentos/tree/master</url>

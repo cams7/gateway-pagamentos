@@ -86,7 +86,6 @@
 				<artifactId>gateway-pagamentos-app-war</artifactId>
 				<version>${project.version}</version>
 				<type>war</type>
-				<scope>compile</scope>
 			</dependency>
 
 			<dependency>

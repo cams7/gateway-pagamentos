@@ -5,8 +5,8 @@ package br.com.cams7.app.model;
 
 import java.util.List;
 
+import br.com.cams7.app.itau.Pagamento.TipoPagamento;
 import br.com.cams7.app.model.entity.Pedido;
-import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
 
 /**
  * @author cesaram

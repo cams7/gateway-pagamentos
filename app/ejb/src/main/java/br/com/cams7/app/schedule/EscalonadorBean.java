@@ -1,9 +1,9 @@
 package br.com.cams7.app.schedule;
 
-import static br.com.cams7.app.model.entity.Pedido.TipoPagamento.A_VISTA;
-import static br.com.cams7.app.model.entity.Pedido.TipoPagamento.BOLETO;
-import static br.com.cams7.app.model.entity.Pedido.TipoPagamento.CARTAO_CREDITO;
-import static br.com.cams7.app.model.entity.Pedido.TipoPagamento.NAO_ESCOLHIDO;
+import static br.com.cams7.app.itau.Pagamento.TipoPagamento.A_VISTA;
+import static br.com.cams7.app.itau.Pagamento.TipoPagamento.BOLETO;
+import static br.com.cams7.app.itau.Pagamento.TipoPagamento.CARTAO_CREDITO;
+import static br.com.cams7.app.itau.Pagamento.TipoPagamento.NAO_ESCOLHIDO;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_A_VISTA;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_BOLETOS;
 import static br.com.cams7.app.model.entity.Tarefa.TarefaId.PAGAMENTOS_CARTOES_CREDITO;
@@ -15,14 +15,16 @@ import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_
 import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_PAGAMENTOS_CARTOES_CREDITO;
 import static br.com.cams7.app.schedule.jobs.CarregaPedidosPendentesJob.CARREGA_PAGAMENTOS_NAO_ESCOLHIDOS;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosNaoVerificadosJob.PROCESSA_PEDIDOS_NAO_VERIFICADOS;
-import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.TIPO_PAGAMENTO;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_A_VISTA;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_BOLETOS;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_CARTOES_CREDITO;
 import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.PROCESSA_PAGAMENTOS_NAO_ESCOLHIDOS;
+import static br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob.TIPO_PAGAMENTO;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -44,11 +46,9 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.JobFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import br.com.cams7.app.itau.Pagamento.TipoPagamento;
 import br.com.cams7.app.model.TarefaRepository;
-import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
 import br.com.cams7.app.model.entity.Tarefa;
 import br.com.cams7.app.model.entity.Tarefa.TarefaId;
 import br.com.cams7.app.schedule.jobs.CarregaPedidosNaoVerificadosJob;
@@ -60,7 +60,7 @@ import br.com.cams7.app.schedule.jobs.ProcessaPedidosPendentesJob;
 @Singleton
 public class EscalonadorBean {
 
-	private Logger LOG = LoggerFactory.getLogger(getClass().getName());
+	private Logger LOG = Logger.getLogger(getClass().getName());
 
 	private Scheduler scheduler;
 
@@ -96,7 +96,7 @@ public class EscalonadorBean {
 
 			printJobsAndTriggers(scheduler);
 		} catch (SchedulerException e) {
-			LOG.error("Error while creating scheduler", e);
+			LOG.log(Level.SEVERE, "Error while creating scheduler: {0}", e);
 		}
 	}
 
@@ -232,15 +232,15 @@ public class EscalonadorBean {
 	}
 
 	private void printJobsAndTriggers(Scheduler scheduler) throws SchedulerException {
-		LOG.info("Quartz Scheduler: {}", scheduler.getSchedulerName());
+		LOG.log(Level.INFO, "Quartz Scheduler: {0}", scheduler.getSchedulerName());
 		for (String group : scheduler.getJobGroupNames()) {
 			for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.<JobKey>groupEquals(group))) {
-				LOG.info("Found job identified by {}", jobKey);
+				LOG.log(Level.INFO, "Found job identified by {0}", jobKey);
 			}
 		}
 		for (String group : scheduler.getTriggerGroupNames()) {
 			for (TriggerKey triggerKey : scheduler.getTriggerKeys(GroupMatcher.<TriggerKey>groupEquals(group))) {
-				LOG.info("Found trigger identified by {}", triggerKey);
+				LOG.log(Level.INFO, "Found trigger identified by {0}", triggerKey);
 			}
 		}
 	}
@@ -255,7 +255,7 @@ public class EscalonadorBean {
 			try {
 				scheduler.shutdown(false);
 			} catch (SchedulerException e) {
-				LOG.error("Error while closing scheduler", e);
+				LOG.log(Level.SEVERE, "Error while closing scheduler: {0}", e);
 			}
 		}
 	}

@@ -6,7 +6,7 @@ package br.com.cams7.app.converter;
 import javax.faces.convert.EnumConverter;
 import javax.faces.convert.FacesConverter;
 
-import br.com.cams7.app.model.entity.Pedido.SituacaoPagamento;
+import br.com.cams7.app.itau.Pagamento.SituacaoPagamento;
 
 /**
  * @author cesaram

@@ -3,8 +3,8 @@
  */
 package br.com.cams7.app.model;
 
-import static br.com.cams7.app.model.entity.Pedido.SituacaoPagamento.ERRO_PROCESSAMENTO;
-import static br.com.cams7.app.model.entity.Pedido.SituacaoPagamento.NAO_FINALIZADO;
+import static br.com.cams7.app.itau.Pagamento.SituacaoPagamento.ERRO_PROCESSAMENTO;
+import static br.com.cams7.app.itau.Pagamento.SituacaoPagamento.NAO_FINALIZADO;
 
 import java.util.Date;
 import java.util.List;
@@ -20,10 +20,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
+import br.com.cams7.app.itau.Pagamento.SituacaoPagamento;
+import br.com.cams7.app.itau.Pagamento.TipoPagamento;
 import br.com.cams7.app.model.entity.Cliente;
 import br.com.cams7.app.model.entity.Pedido;
-import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
-import br.com.cams7.app.model.entity.Pedido.SituacaoPagamento;
 
 /**
  * @author cesaram

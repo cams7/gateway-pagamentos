@@ -1,58 +1,64 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-	
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>br.com.cams7</groupId>
 		<artifactId>gateway-pagamentos-app</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-    <artifactId>gateway-pagamentos-app-ear</artifactId>
-    <packaging>ear</packaging>
+	<artifactId>gateway-pagamentos-app-ear</artifactId>
+	<packaging>ear</packaging>
 
-    <name>Aplicação de Gateway de pagamentos - EAR</name>
-    <description>Módulo EAR da aplicação Gateway de pagamentos</description>
+	<name>Aplicação de Gateway de pagamentos - EAR</name>
+	<description>Módulo EAR da aplicação Gateway de pagamentos</description>
 
-    <dependencies>
+	<dependencies>
 		<dependency>
 			<groupId>br.com.cams7</groupId>
 			<artifactId>gateway-pagamentos-commons</artifactId>
 			<type>jar</type>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>br.com.cams7</groupId>
 			<artifactId>gateway-pagamentos-app-model</artifactId>
 			<type>jar</type>
 		</dependency>
-		
-        <dependency>
+
+		<dependency>
 			<groupId>br.com.cams7</groupId>
 			<artifactId>gateway-pagamentos-app-ejb</artifactId>
 			<type>ejb</type>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>br.com.cams7</groupId>
 			<artifactId>gateway-pagamentos-app-war</artifactId>
 			<type>war</type>
 		</dependency>
-    </dependencies>
+	</dependencies>
 
-    <build>
-      <finalName>${project.artifactId}</finalName>
-        <plugins>
-            <!-- Ear plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-ear-plugin</artifactId>
-                <version>${version.ear.plugin}</version>
-                <configuration>
-                    <version>6</version>
-                    <defaultLibBundleDir>lib</defaultLibBundleDir>
-                    <modules>
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<!-- Ear plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-ear-plugin</artifactId>
+				<version>${version.ear.plugin}</version>
+				<configuration>
+					<version>6</version>
+					<defaultLibBundleDir>lib</defaultLibBundleDir>
+					<modules>
+						<jarModule>
+							<groupId>br.com.cams7</groupId>
+							<artifactId>gateway-pagamentos-commons</artifactId>
+							<bundleDir>/</bundleDir>
+							<includeInApplicationXml>true</includeInApplicationXml>
+						</jarModule>
 						<jarModule>
 							<groupId>br.com.cams7</groupId>
 							<artifactId>gateway-pagamentos-app-model</artifactId>
@@ -63,25 +69,25 @@
 							<groupId>br.com.cams7</groupId>
 							<artifactId>gateway-pagamentos-app-ejb</artifactId>
 						</ejbModule>
-                        <webModule>
-                            <groupId>br.com.cams7</groupId>
-                            <artifactId>gateway-pagamentos-app-war</artifactId>
-                            <contextRoot>/gateway-pagamentos</contextRoot>
-                        </webModule>
-                    </modules>
-                    <fileNameMapping>no-version</fileNameMapping>
-                </configuration>
-            </plugin>
-            <!-- WildFly plugin to deploy ear -->
-            <plugin>
-                <groupId>org.wildfly.plugins</groupId>
-                <artifactId>wildfly-maven-plugin</artifactId>
-                <version>${version.wildfly.maven.plugin}</version>
-                <configuration>
-                    <filename>${project.artifactId}.ear</filename>
-                    <skip>false</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+						<webModule>
+							<groupId>br.com.cams7</groupId>
+							<artifactId>gateway-pagamentos-app-war</artifactId>
+							<contextRoot>/gateway-pagamentos</contextRoot>
+						</webModule>
+					</modules>
+					<fileNameMapping>no-version</fileNameMapping>
+				</configuration>
+			</plugin>
+			<!-- WildFly plugin to deploy ear -->
+			<plugin>
+				<groupId>org.wildfly.plugins</groupId>
+				<artifactId>wildfly-maven-plugin</artifactId>
+				<version>${version.wildfly.maven.plugin}</version>
+				<configuration>
+					<filename>${project.artifactId}.ear</filename>
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

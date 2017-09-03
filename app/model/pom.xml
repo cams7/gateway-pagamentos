@@ -16,6 +16,12 @@
 	<description>Módulo MODEL da aplicação Gateway de pagamentos</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>br.com.cams7</groupId>
+			<artifactId>gateway-pagamentos-commons</artifactId>
+			<type>jar</type>
+		</dependency>
+		
 		<!-- Import the CDI API, we use provided scope as the API is included in 
 			JBoss WildFly -->
 		<dependency>
@@ -40,24 +46,24 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<scope>provided</scope>
+			<scope>provided</scope>			
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
+			<scope>provided</scope>			
 		</dependency>
 
 		<dependency>
 			<groupId>com.enigmabridge</groupId>
 			<artifactId>hibernate4-sqlite-dialect</artifactId>
 			<version>0.1.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 </project>

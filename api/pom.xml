@@ -27,6 +27,8 @@
 		<db.connection.url>jdbc:sqlite:${databases.path}/${api.database}.sqlite</db.connection.url>
 		<db.username></db.username>
 		<db.password></db.password>
+		
+		<org.apache.httpcomponents.scope>compile</org.apache.httpcomponents.scope>
 	</properties>
 
 	<dependencies>

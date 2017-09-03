@@ -2,9 +2,6 @@ package br.com.cams7.app.itau;
 
 import java.util.Date;
 
-import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
-import br.com.cams7.app.model.entity.Pedido.SituacaoPagamento;
-
 public class Pagamento {
 
 	/**
@@ -203,6 +200,97 @@ public class Pagamento {
 
 	public void setTipoCartaoCredito(String tipoCartaoCredito) {
 		this.tipoCartaoCredito = tipoCartaoCredito;
+	}
+
+	// TIPPAG
+	public enum TipoPagamento {
+		// Manual Shopline do Itaú
+		// Página 28
+		// 2.5.3 Consulta Automática à Situação do Pagamento (sonda)
+		NAO_ESCOLHIDO("00", "pagamento ainda não escolhido"),
+
+		A_VISTA("01", "pagamento à vista (TEF e CDC)"),
+
+		BOLETO("02", "boleto bancário"),
+
+		CARTAO_CREDITO("03", "cartão de crédito");
+
+		private String codigoItau;
+		private String descricao;
+
+		private TipoPagamento(String codigoItau, String descricao) {
+			this.codigoItau = codigoItau;
+			this.descricao = descricao;
+		}
+
+		public String getCodigoItau() {
+			return codigoItau;
+		}
+
+		public String getDescricao() {
+			return descricao;
+		}
+
+		public static TipoPagamento getTipoPagamento(String codigoItau) {
+			if (codigoItau == null)
+				return null;
+
+			for (TipoPagamento tipoPagamento : values())
+				if (tipoPagamento.getCodigoItau().equals(codigoItau))
+					return tipoPagamento;
+
+			return null;
+		}
+
+	}
+
+	// SITPAG
+	public enum SituacaoPagamento {
+		// Manual Shopline do Itaú
+		// Página 28
+		// 2.5.3 Consulta Automática à Situação do Pagamento (sonda)
+
+		// On-line e real time
+		EFETUADO("00", "pagamento efetuado"), NAO_FINALIZADO("01",
+				"situação de pagamento não finalizada (tente novamente)"),
+
+		ERRO_PROCESSAMENTO("02", "erro no processamento da consulta (tente novamente)"),
+
+		NAO_LOCALIZADO("03", "pagamento não localizado (consulta fora de prazo ou pedido não registrado no banco)"),
+
+		BOLETO_EMITIDO("04", "boleto emitido com sucesso"),
+
+		AGUARDANDO_COMPENSACAO("05", "pagamento efetuado, aguardando compensação"),
+
+		NAO_COMPENSADO("06", "pagamento não compensado");
+
+		private String codigoItau;
+		private String descricao;
+
+		private SituacaoPagamento(String codigoItau, String descricao) {
+			this.codigoItau = codigoItau;
+			this.descricao = descricao;
+		}
+
+		public String getCodigoItau() {
+			return codigoItau;
+		}
+
+		public String getDescricao() {
+			return descricao;
+		}
+
+		public static SituacaoPagamento getSituacaoPagamento(String codigoItau) {
+			if (codigoItau == null)
+				return null;
+
+			for (SituacaoPagamento situacaoPagamento : values())
+				if (situacaoPagamento.getCodigoItau().equals(codigoItau))
+					return situacaoPagamento;
+
+			return null;
+		}
+
 	}
 
 }

@@ -12,11 +12,11 @@ import javax.enterprise.inject.Produces;
 import javax.faces.application.FacesMessage;
 import javax.inject.Named;
 
+import br.com.cams7.app.itau.Pagamento.SituacaoPagamento;
+import br.com.cams7.app.itau.Pagamento.TipoPagamento;
 import br.com.cams7.app.model.PedidoRepository;
 import br.com.cams7.app.model.entity.Cliente;
 import br.com.cams7.app.model.entity.Pedido;
-import br.com.cams7.app.model.entity.Pedido.TipoPagamento;
-import br.com.cams7.app.model.entity.Pedido.SituacaoPagamento;
 
 /**
  * @author cesaram
@@ -39,7 +39,6 @@ public class PedidoController extends AppController {
 		return novoPedido;
 	}
 
-	
 	@Override
 	public void cadastra() {
 		try {

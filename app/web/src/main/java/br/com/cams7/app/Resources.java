@@ -14,21 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.cams7.app.util;
-
-import java.util.logging.Logger;
+package br.com.cams7.app;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
 import javax.faces.context.FacesContext;
 
 public class Resources {
-
-	@Produces
-	public Logger produceLog(InjectionPoint injectionPoint) {
-		return Logger.getLogger(injectionPoint.getMember().getDeclaringClass().getName());
-	}
 
 	@Produces
 	@RequestScoped
