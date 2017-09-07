@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/default.xhtml">
+
+	<f:metadata>
+		<f:viewParam name="c" value="#{pedidoController.clienteId}" />
+	</f:metadata>
+
+	<ui:define name="content">
+		<h1>Pedido</h1>
+
+		<div>
+			<h:messages styleClass="messages" errorClass="invalid"
+				infoClass="valid" warnClass="warning" globalOnly="true" />
+		</div>
+		<div>
+			<h:form id="reg">
+				<h2>Cadastro de pedido</h2>
+				<h:panelGrid columns="3" columnClasses="titleCell">
+					<h:outputLabel for="valorPedido" value="Valor do pedido:" />
+					<h:inputText id="valorPedido" value="#{novoPedido.valorPedido}" />
+					<h:message for="valorPedido" errorClass="invalid" />
+
+					<h:outputLabel for="dataPedido" value="Data do pedido:" />
+					<h:inputText id="dataPedido" value="#{novoPedido.dataPedido}"
+						readonly="true">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+					</h:inputText>
+					<h:message for="dataPedido" errorClass="invalid" />
+				</h:panelGrid>
+
+				<p>
+					<h:panelGrid columns="2">
+						<h:commandButton id="register"
+							action="#{pedidoController.cadastra}" value="Cadastrar"
+							styleClass="register" />
+						<h:link value="Atualizar listagem" outcome="pedidos"
+							styleClass="register">
+							<f:param name="c" value="#{pedidoController.clienteId}" />
+						</h:link>
+					</h:panelGrid>
+				</p>
+			</h:form>
+		</div>
+		<div>
+			<h2>Pedidos</h2>
+			<h:panelGroup rendered="#{empty pedidos}">
+				<em>Pedido não cadastrado.</em>
+			</h:panelGroup>
+			<p:dataTable var="p" value="#{pedidos}"
+				rendered="#{not empty pedidos}" styleClass="simpletablestyle">
+				<p:column headerText="ID">
+					<h:outputText value="#{p.id}" />
+				</p:column>
+				<p:column headerText="Custo">
+					<h:outputText value="#{p.valorPedido}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Pago">
+					<h:outputText value="#{p.valorPago}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Data do pedido">
+					<h:outputText value="#{p.dataPedido}">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Data do pagamento">
+					<h:outputText value="#{p.dataPagamento}">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Tipo de pagamento">
+					<h:outputText value="#{p.tipoPagamento}" />
+				</p:column>
+				<p:column headerText="Situação">
+					<h:outputText value="#{p.situacaoPagamento}" />
+				</p:column>
+				<p:column>
+					<p:commandButton type="button"
+						onclick="openShopline(`${pedidoController.getDadosCriptografados(p)}`)"
+						value="Shopline"
+						disabled="${p.situacaoPagamento!=null and p.situacaoPagamento != 'NAO_FINALIZADO' and p.situacaoPagamento != 'ERRO_PROCESSAMENTO'}" />
+				</p:column>
+			</p:dataTable>
+		</div>
+
+		<div id="shopline" style="visibility: hidden; display: inline;">
+			<FORM METHOD="POST" ACTION="${pedidoController.urlShopline}"
+				onsubmit="carregabrw()" target="SHOPLINE">
+				<INPUT TYPE="hidden" NAME="DC" VALUE="" />
+			</FORM>
+		</div>
+	</ui:define>
+</ui:composition>

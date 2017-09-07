@@ -1,0 +1,291 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>br.com.cams7</groupId>
+	<artifactId>gateway-pagamentos</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Gateway de pagamentos</name>
+	<description>Gateway de pagamentos</description>
+
+	<properties>
+		<user.name>César A. Magalhães</user.name>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
+
+		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+
+		<version.compiler.plugin>2.3.2</version.compiler.plugin>
+		<version.jar.plugin>2.6</version.jar.plugin>
+		<version.war.plugin>2.1.1</version.war.plugin>
+		<version.dependency.plugin>2.1</version.dependency.plugin>
+
+		<databases.path>/Desenv/Github/emp1/gateway-pagamentos/db</databases.path>
+		
+		<app.tipoPagamento>http://localhost:8080/gateway-pagamentos/retorno</app.tipoPagamento>
+		<itau.shopline>http://localhost:8090/itau/shopline</itau.shopline>	
+		<itau.consulta>http://localhost:8090/itau/consulta</itau.consulta>		
+		<itau.codigo.empresa>J0000560680005480000000013</itau.codigo.empresa>
+		<itau.chave.criptografia>A1B2C3D4E5F6G7H8</itau.chave.criptografia>		
+	</properties>
+
+	<url>https://github.com/cams7/gateway-pagamentos/tree/master</url>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<distribution>repo</distribution>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:https://github.com/cams7/gateway-pagamentos.git</connection>
+	</scm>
+
+	<modules>
+		<module>commons</module>
+		<module>app</module>		
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>br.com.cams7</groupId>
+				<artifactId>gateway-pagamentos-commons</artifactId>
+				<version>${project.version}</version>
+				<type>jar</type>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<!--version>4.4.6</version -->
+				<version>4.2.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<!--version>4.5.3</version -->
+				<version>4.2.1</version>
+			</dependency>			
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${version.compiler.plugin}</version>
+					<configuration>
+						<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
+						<compilerArguments>
+							<endorseddirs>${endorsed.dir}</endorseddirs>
+						</compilerArguments>
+					</configuration>
+				</plugin>
+
+				<!--Gera algumas informações no arquivo MANIFEST.MF do projeto -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${version.jar.plugin}</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+								<classpathPrefix />
+							</manifest>
+							<manifestEntries>
+								<url>${project.url}</url>
+								<Implementation-Build>${buildNumber}</Implementation-Build>
+								<Implementation-Title>${project.name}</Implementation-Title>
+								<Implementation-Vendor>N/A</Implementation-Vendor>
+								<Implementation-Version>${project.version}</Implementation-Version>
+								<Built-By>${user.name}</Built-By>
+								<Built-OS>${os.name}</Built-OS>
+								<Build-Date>${timestamp}</Build-Date>
+								<SCM>${buildNumber}</SCM>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>${version.war.plugin}</version>
+					<configuration>
+						<failOnMissingWebXml>false</failOnMissingWebXml>
+						<webResources>
+							<resource>
+								<directory>src/main/webapp</directory>
+								<filtering>true</filtering>
+								<includes>
+									<include>META-INF/*.xml</include>
+									<include>WEB-INF/*.xml</include>
+								</includes>
+							</resource>
+						</webResources>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+								<classpathPrefix />
+							</manifest>
+							<manifestEntries>
+								<url>${project.url}</url>
+								<Implementation-Build>${buildNumber}</Implementation-Build>
+								<Implementation-Title>${project.name}</Implementation-Title>
+								<Implementation-Vendor>N/A</Implementation-Vendor>
+								<Implementation-Version>${project.version}</Implementation-Version>
+								<Built-By>${user.name}</Built-By>
+								<Built-OS>${os.name}</Built-OS>
+								<Build-Date>${timestamp}</Build-Date>
+								<SCM>${buildNumber}</SCM>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>${version.dependency.plugin}</version>
+					<executions>
+						<execution>
+							<phase>validate</phase>
+							<goals>
+								<goal>copy</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${endorsed.dir}</outputDirectory>
+								<silent>true</silent>
+								<artifactItems>
+									<artifactItem>
+										<groupId>javax</groupId>
+										<artifactId>javaee-endorsed-api</artifactId>
+										<version>7.0</version>
+										<type>jar</type>
+									</artifactItem>
+								</artifactItems>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<!--Gera informações do controle de versão -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!--Cria os arquivos de configuração do Eclipse -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>	
+		<profile>
+			<id>unix</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>Linux</name>
+				</os>
+			</activation>
+			<properties>
+				<databases.path>/home/vagrant/github/gateway-pagamentos/db</databases.path>
+				
+				<app.tipoPagamento>http://localhost:8180/gateway-pagamentos/retorno</app.tipoPagamento>
+				<itau.shopline>http://localhost:8185/itau/shopline</itau.shopline>
+				<itau.consulta>http://localhost:8080/itau/consulta</itau.consulta>				
+			</properties>			
+		</profile>
+		
+		<profile>
+			<id>default</id>
+			<activation>
+				<property>
+					<name>default</name>
+				</property>
+			</activation>
+			<properties>
+			</properties>
+			<modules>
+				<module>itaucripto-fake</module>
+				<module>itau-shopline-fake</module>
+			</modules>
+			<dependencyManagement>
+				<dependencies>
+					<dependency>
+						<groupId>br.com.cams7</groupId>
+						<artifactId>itaucripto-fake</artifactId>
+						<version>${project.version}</version>
+						<type>jar</type>
+					</dependency>
+				</dependencies>
+			</dependencyManagement>
+		</profile>
+				
+		<profile>
+			<id>itau</id>
+			<activation>
+				<property>
+					<name>itau</name>
+				</property>
+			</activation>
+			<properties>
+				<app.tipoPagamento>https://www.minhaloja.com.br/final/retorno.aspx</app.tipoPagamento>
+				<itau.shopline>https://shopline.itau.com.br/shopline/shopline.aspx</itau.shopline>
+				<itau.consulta>https://shopline.itau.com.br/shopline/consulta.aspx</itau.consulta>						
+				<itau.codigo.empresa>J0000560680005480000000013</itau.codigo.empresa>
+				<itau.chave.criptografia>A1B2C3D4E5F6G7H8</itau.chave.criptografia>
+			</properties>
+			<dependencyManagement>
+				<dependencies>
+					<dependency>
+						<groupId>itau</groupId>
+						<artifactId>itaucripto</artifactId>
+						<version>shopline</version>
+					</dependency>
+				</dependencies>
+			</dependencyManagement>
+		</profile>		
+	</profiles>
+</project>

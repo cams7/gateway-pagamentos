@@ -1,0 +1,108 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>br.com.cams7</groupId>
+		<artifactId>gateway-pagamentos-app</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>gateway-pagamentos-app-war</artifactId>
+	<packaging>war</packaging>
+
+	<name>Aplicação de Gateway de pagamentos - WAR</name>
+	<description>Módulo WAR da aplicação Gateway de pagamentos</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>br.com.cams7</groupId>
+			<artifactId>gateway-pagamentos-commons</artifactId>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>br.com.cams7</groupId>
+			<artifactId>gateway-pagamentos-app-model</artifactId>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>br.com.cams7</groupId>
+			<artifactId>gateway-pagamentos-app-ejb</artifactId>
+			<type>ejb</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the CDI API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the Common Annotations API (JSR-250), we use provided scope 
+			as the API is included in JBoss WildFly -->
+		<!--dependency> <groupId>org.jboss.spec.javax.annotation</groupId> <artifactId>jboss-annotations-api_1.2_spec</artifactId> 
+			<scope>provided</scope> </dependency -->
+
+		<!-- Import the EJB API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.spec.javax.ejb</groupId>
+			<artifactId>jboss-ejb-api_3.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the JSF API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.spec.javax.faces</groupId>
+			<artifactId>jboss-jsf-api_2.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.primefaces</groupId>
+			<artifactId>primefaces</artifactId>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<property>
+					<name>default</name>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>br.com.cams7</groupId>
+					<artifactId>itaucripto-fake</artifactId>
+					<type>jar</type>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<profile>
+			<id>itau</id>
+			<activation>
+				<property>
+					<name>itau</name>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>itau</groupId>
+					<artifactId>itaucripto</artifactId>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+</project>
