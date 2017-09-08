@@ -16,11 +16,14 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.w3c.dom.Document;
@@ -177,7 +180,23 @@ public class ApiShopline {
 
 		final String USER_AGENT = "Mozilla/5.0";
 
-		HttpClient client = new DefaultHttpClient();
+		DefaultHttpClient client = new DefaultHttpClient();
+
+		final boolean PROXY_ATIVO = "1".equals(AppConfig.getProperty("PROXY_ATIVO"));
+
+		if (PROXY_ATIVO) {
+			final String PROXY_HOST = AppConfig.getProperty("PROXY_HOST");
+			final int PROXY_PORT = Integer.valueOf(AppConfig.getProperty("PROXY_PORT"));
+			final String PROXY_USERNAME = AppConfig.getProperty("PROXY_USERNAME");
+			final String PROXY_PASSWORD = AppConfig.getProperty("PROXY_PASSWORD");
+
+			client.getCredentialsProvider().setCredentials(new AuthScope(PROXY_HOST, PROXY_PORT),
+					new UsernamePasswordCredentials(PROXY_USERNAME, PROXY_PASSWORD));
+
+			HttpHost proxy = new HttpHost(PROXY_HOST, PROXY_PORT);
+
+			client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+		}
 		HttpPost request = new HttpPost(URL_CONSULTA);
 
 		// add header

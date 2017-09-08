@@ -26,13 +26,19 @@
 		<version.war.plugin>2.1.1</version.war.plugin>
 		<version.dependency.plugin>2.1</version.dependency.plugin>
 
-		<databases.path>/Desenv/Github/emp1/gateway-pagamentos/db</databases.path>
+		<databases.path>/Dev/Vagrant/teste/github/gateway-pagamentos/db</databases.path>
 		
 		<app.tipoPagamento>http://localhost:8080/gateway-pagamentos/retorno</app.tipoPagamento>
 		<itau.shopline>http://localhost:8090/itau/shopline</itau.shopline>	
 		<itau.consulta>http://localhost:8090/itau/consulta</itau.consulta>		
-		<itau.codigo.empresa>J0000560680005480000000013</itau.codigo.empresa>
-		<itau.chave.criptografia>A1B2C3D4E5F6G7H8</itau.chave.criptografia>		
+		<itau.codigo.empresa>A1B2C3D4E5F6G7H8I9J0L1M2N3</itau.codigo.empresa>
+		<itau.chave.criptografia>A1B2C3D4E5F6G7H8</itau.chave.criptografia>	
+
+		<proxy.ativo>0</proxy.ativo>
+		<proxy.host></proxy.host>
+		<proxy.port></proxy.port>
+		<proxy.username></proxy.username>
+		<proxy.password></proxy.password>
 	</properties>
 
 	<url>https://github.com/cams7/gateway-pagamentos/tree/master</url>
@@ -66,13 +72,11 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore</artifactId>
-				<!--version>4.4.6</version -->
 				<version>4.2.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<!--version>4.5.3</version -->
 				<version>4.2.1</version>
 			</dependency>			
 		</dependencies>
@@ -230,7 +234,7 @@
 				</os>
 			</activation>
 			<properties>
-				<databases.path>/home/vagrant/github/gateway-pagamentos/db</databases.path>
+				<databases.path>/vagrant/github/gateway-pagamentos/db</databases.path>
 				
 				<app.tipoPagamento>http://localhost:8180/gateway-pagamentos/retorno</app.tipoPagamento>
 				<itau.shopline>http://localhost:8185/itau/shopline</itau.shopline>
@@ -274,8 +278,14 @@
 				<app.tipoPagamento>https://www.minhaloja.com.br/final/retorno.aspx</app.tipoPagamento>
 				<itau.shopline>https://shopline.itau.com.br/shopline/shopline.aspx</itau.shopline>
 				<itau.consulta>https://shopline.itau.com.br/shopline/consulta.aspx</itau.consulta>						
-				<itau.codigo.empresa>J0000560680005480000000013</itau.codigo.empresa>
+				<itau.codigo.empresa>A1B2C3D4E5F6G7H8I9J0L1M2N3</itau.codigo.empresa>
 				<itau.chave.criptografia>A1B2C3D4E5F6G7H8</itau.chave.criptografia>
+				
+				<proxy.ativo>0</proxy.ativo>
+				<proxy.host>host</proxy.host>
+				<proxy.port>porta</proxy.port>
+				<proxy.username>usuario</proxy.username>
+				<proxy.password>senha</proxy.password>
 			</properties>
 			<dependencyManagement>
 				<dependencies>
